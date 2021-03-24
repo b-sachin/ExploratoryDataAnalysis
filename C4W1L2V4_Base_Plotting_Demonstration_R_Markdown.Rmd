@@ -127,3 +127,20 @@ plot(x,y,pch=8)
 legend("topleft",legend = "Data", pch = 8)
 
 ```
+
+#### 2.6 Plot Parameter: `abline`
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y,pch=8)
+
+# Adding abline to a Plot
+
+# Horizontal line
+
+
+
+```
