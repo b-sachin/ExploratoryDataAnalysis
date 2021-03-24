@@ -1,0 +1,129 @@
+---
+title: "Base Plotting Demonstation"
+author: "Mr. Sachin B."
+date: "24/03/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Histogram
+```{r}
+
+# 100 random numbers using  normal distribution 
+x<-rnorm(100)
+
+# Histogram
+hist(x)
+
+```
+
+### 2. Scatter Plot
+```{r}
+
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y)
+
+# Scatter Plot Practice
+a <- rnorm(100)
+b <- rnorm(100)
+plot(a,b)
+
+```
+
+#### 2.1 Plot Parameter: `Margin`
+```{r}
+
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot Before Applying Margin (Default Margin)
+plot(x,y)
+```
+
+```{r}
+# Adding Margin to Scatter Plot
+par(mar = c(2,2,2,2))
+
+# Scatter Plot After Applying Margin
+plot(x,y)
+
+```
+
+
+#### 2.2 Scatter Plot Parameter: `pch`
+```{r}
+
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+
+# Scatter Plot using pch=20
+plot(x,y,pch=20)
+
+# Scatter Plot using pch=15
+plot(x,y,pch=15)
+
+# Scatter Plot using pch=10
+plot(x,y,pch=10)
+
+# Scatter Plot using pch=5
+plot(x,y,pch=5)
+```
+
+#### To know more about pch symbol
+```{r eval=FALSE }
+example("points")
+```
+
+#### 2.3 Plot Parameter: `title`
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y,pch=13)
+
+# Adding Title to Plot
+title("My Scatterplot")
+
+```
+
+#### 2.4 Plot Parameter: `text`
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y,pch=8)
+
+# Adding Text in a Plot
+text(-2,-1,"MyText")
+
+```
+
+#### 2.5 Plot Parameter: `legend`
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y,pch=8)
+
+# Adding Legend to a Plot
+legend("topleft",legend = "Data", pch = 8)
+
+```

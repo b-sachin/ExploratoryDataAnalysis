@@ -1,0 +1,17 @@
+---
+title: "Base Plotting Demonstation"
+author: "Mr. Sachin B."
+date: "24/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+x<-rnorm(100)
+ hist(x)
+ 
+```
+
