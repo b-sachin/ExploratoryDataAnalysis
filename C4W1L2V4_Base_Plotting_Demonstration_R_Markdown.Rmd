@@ -141,6 +141,12 @@ plot(x,y,pch=8)
 
 # Horizontal line
 
+# verticle line
+
+# ab line
+plot(-5:5,-5:5)
+abline(h=0,v=0)
+abline(a=2,b=3)
 
 
 ```
