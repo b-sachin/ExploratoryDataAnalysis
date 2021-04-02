@@ -8,3 +8,5 @@ hist(x)
 # 100 random numbers using  normal distribution 
 x<-rnorm(100)
 hist(x)
+
+# next line
