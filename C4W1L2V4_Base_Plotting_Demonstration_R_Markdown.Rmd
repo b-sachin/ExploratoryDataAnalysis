@@ -3,8 +3,8 @@ title: "Base Plotting Demonstation"
 author: "Mr. Sachin B."
 date: "24/03/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -40,19 +40,8 @@ plot(a,b)
 ```
 
 ### 3. Plot Parameter
-- mar [margin]
-- title
-- legend 
-- text
-- abline
-- grid
 
-- pch
-- col
-- lwd
-- lty
-
-#### 3.1 Plot Parameter: `Margin`
+#### 3.1 `Margin`
 ```{r}
 
 # 100 random numbers using  normal distribution 
@@ -73,7 +62,7 @@ plot(x,y)
 ```
 
 
-#### 3.2 Scatter Plot Parameter: `pch`
+#### 3.2 `pch`
 ```{r}
 
 # 100 random numbers using  normal distribution 
@@ -99,7 +88,7 @@ plot(x,y,pch=5)
 example("points")
 ```
 
-#### 3.3 Plot Parameter: `title`
+#### 3.3 `title`
 ```{r}
 # 100 random numbers using  normal distribution 
 x <- rnorm(100)
@@ -113,7 +102,7 @@ title("My Scatterplot")
 
 ```
 
-#### 3.4 Plot Parameter: `text`
+#### 3.4 `text`
 ```{r}
 # 100 random numbers using  normal distribution 
 x <- rnorm(100)
@@ -127,7 +116,7 @@ text(-2,-1,"MyText")
 
 ```
 
-#### 3.5 Plot Parameter: `legend`
+#### 3.5 `legend`
 ```{r}
 # 100 random numbers using  normal distribution 
 x <- rnorm(100)
@@ -141,7 +130,7 @@ legend("topleft",legend = "Data", pch = 8)
 
 ```
 
-#### 3.6 Plot Parameter: `abline`
+#### 3.6 `abline`
 `abline` function adds one or more straight lines through the current plot.<br>
 
 The basic syntax is of abline() is as follows:<br>
@@ -319,7 +308,7 @@ grid (3,5, lty = 6, col = "cornsilk2")
 
 ```
 
-#### 3.7  Multiple Plot in Single Canvas
+### 4.  Multiple Plot in Single Canvas
 
 - `mfrow()`
 - `mfcol()`
@@ -333,14 +322,14 @@ z <- rpois(100,2)
 
 ```
 
-##### Multiple Plot: 2-rows & 1-column
+#### 4.1. Multiple Plot: 2-rows & 1-column
 ```{r}
 par(mfrow = c(2,1))
 plot(x,y,pch=20)
 plot(x,z,pch=20)
 ```
 
-##### Multiple Plot: 1-rows & 2-columns
+#### 4.2. Multiple Plot: 1-rows & 2-columns
 ```{r}
 
 par(mfrow = c(1,2))
@@ -349,7 +338,7 @@ plot(x,z,pch=20)
 
 ```
 
-##### Multiple Plot (row-wise): 2-rows & 2-columns
+#### 4.3. Multiple Plot (row-wise): 2-rows & 2-columns
 ```{r}
 
 par(mfrow = c(2,2))
@@ -360,7 +349,7 @@ plot(z,x,pch=20, main = "Forth")
 
 ```
 
-##### Multiple Plot (column-wise): 2-rows & 2-columns
+#### 4.4. Multiple Plot (column-wise): 2-rows & 2-columns
 ```{r}
 
 par(mfcol = c(2,2))
@@ -371,7 +360,7 @@ plot(z,x,pch=20, main = "Forth")
 
 ```
 
-#### 3.8  Points Variable
+### 5. Points Variable
 
 ```{r}
 
@@ -398,6 +387,5 @@ points(x[g=="Male"],y[g=="Male"], col = "light blue",pch=19)
 
 # Add Female points to graph
 points(x[g=="Female"],y[g=="Female"], col = "pink", pch=19)
-
 
 ```
