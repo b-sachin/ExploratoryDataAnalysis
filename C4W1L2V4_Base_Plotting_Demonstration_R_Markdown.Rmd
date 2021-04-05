@@ -89,16 +89,29 @@ example("points")
 ```
 
 #### 3.3 `title`
+
+##### Approach 1
 ```{r}
 # 100 random numbers using  normal distribution 
 x <- rnorm(100)
 y <- rnorm(100)
 
 # Scatter Plot
-plot(x,y,pch=13)
+plot(x,y)
 
 # Adding Title to Plot
-title("My Scatterplot")
+title("My Scatterplot 1")
+
+```
+
+##### Approach 2
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot along with title
+plot(x,y, main="Scatterplot 2")
 
 ```
 
