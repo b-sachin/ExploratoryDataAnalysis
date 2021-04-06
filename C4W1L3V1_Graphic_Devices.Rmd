@@ -1,0 +1,48 @@
+---
+title: "Graphic Devices in R"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. What is Graphic Device?
+
+A graphics device is something where you can make a plot appear
+
+- A window on your computer (screen device)
+- A PDF file (file device)
+- A PNG or JPEG file (file device)
+- A scalable vector graphics (SVG) file (file device)
+
+When you make a plot in R, it has to be "sent" to a specific graphics device.
+
+The most common place for a plot to be "sent" is the screen device
+
+- Screen device on Mac is launched with the quartz()
+- Screen device on is launched with windows()
+- Screen device on Unix/Linux is launched with x11()
+
+### 2. How to create Plot
+I. For quick visualizations, usually the **screen device is used**.
+II. For plots that printed out or incorporated into a document such as papers/reports, slide presentations, usually a **file device is more appropriate**.
+  
+#### I. 
+  1. call a plotting Functions like 
+    
+- `plot` in **base**, 
+- `xyplot` in **lattice**, or 
+- `qplot` in **ggplot2** will default to sending a plot to the screen device
+
+
+```{r}
+
+# 100 random numbers using  normal distribution 
+x<-rnorm(100)
+
+# Histogram
+hist(x)
+
+```
