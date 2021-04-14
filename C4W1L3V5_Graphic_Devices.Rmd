@@ -1,0 +1,135 @@
+---
+title: "Graphic Devices in R"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. What is Graphic Device?
+ 
+A graphics device is something where you can make a plot appear
+
+- A window on your computer (screen device)
+- A PDF file (file device)
+- A PNG or JPEG file (file device)
+- A scalable vector graphics (SVG) file (file device)
+
+When you make a plot in R, it has to be "sent" to a specific graphics device.
+
+1. The most common place for a plot to be "sent" is the **screen device**
+    i) Screen device on **Mac** is launched with the `quartz()`
+    ii) Screen device on **Windows** is launched with `windows()`
+    iii) Screen device on **Unix/Linux** is launched with `x11()` <br>
+    Note: There is only one screen device on a Platform (Windows, Mac, Unix/Linux).
+2. For plots that may be printed out or be incorporated into a document (e.g. Papers/Reports, Slide Presentation), a **file device** is useful.
+    i) `pdf()`
+
+### 2. How to create Plot
+I. Creating plot on **screen device**. <br>
+II. Creating plot on **file device**.
+  
+#### I. Creating plot on 'screen device'
+1. call a plotting Function 
+    - `plot()` in **base**, e.g. `plot(x,y)`, 
+    - `xyplot()` in **lattice**, or 
+    - `qplot()` in **ggplot2** will default to sending a plot to the screen device
+2. Plot appears on the **screen device**
+3. Annotate plot if necessary
+    - `title(main= "Old Faithful Geyser data")`
+
+```{r}
+
+library(datasets)
+
+with(faithful,plot(eruptions,waiting)) ## Make plot appear on screen device
+title(main= "Old Faithful Geyser data") ## Annotate plot
+
+```
+
+#### II. Creating plot on 'file device'
+1. Explicitly launch a graphics device
+    - `pdf(file="myplot.pdf")`
+2. call a plotting Function (**Note:if you are using a file device, no plot will appear on the screen** )
+    - `plot()` in **base** e.g. `plot(x,y)`, 
+    - `xyplot()` in **lattice**, or 
+    - `qplot()` in **ggplot2**
+3. Annotate plot if necessary
+    - `title(main= "Old Faithful Geyser data")`
+4. Explicitly close graphics  device with `dev.off()` (**Note:This is very important step**)
+
+```{r}
+
+library(datasets)
+
+pdf(file = "myplot.pdf") ## Open PDF file; create 'myplot.pdf' in working directory
+
+with(faithful,plot(eruptions,waiting)) ## Create plot and send to a file (no plot appears on screen device)
+
+title(main= "Old Faithful Geyser data") ## Annotate plot; still nothing on screen
+
+dev.off() ## Close the PDF file device; Now the 'myplot.pdf' will appear on the screen.
+
+```
+
+### 3. Multiple Open Graphics Devices
+It is possible to open multiple graphics devices (screen, file, or both).<br>
+The **currently active graphics device** can be found by calling `dev.cur()` <br>
+Every open graphics device is assigned an integer starting with 2 (there is no graphics device 1).<br>
+You can change the active graphics device with `dev.set(<integer>)`
+
+```{r}
+# Open first device and plot data1
+windows()
+data1 <- 1:10
+plot(data1,main="FIRST")
+ 
+# Open second device and plot data2
+windows()
+data2 <- rnorm(10)
+plot(data2, main="SECOND")
+
+
+# 1. Currently active device `dev.cur()`
+dev.cur()
+
+# 2. Setting active device `dev.set(<integer>)`
+
+## set active device and draw line1
+dev.set(3)
+abline(0,1, col = "red")
+
+# 3. Switching active device `dev.prev()` & `dev.next()`
+
+## Switch active device and draw line2
+dev.set(dev.next())
+abline(h = mean(data2), col = "red")
+
+## Switch active device and draw legend
+dev.set(dev.prev())
+abline(0,1, col = "green", lwd=5)
+legend("topleft",legend = "Data", pch = 1)
+
+```
+
+### 4. Copying Plots
+The `dev.copy()` can be used to copy a plot from one device to another.
+
+```{r}
+library(datasets)
+ 
+## Create plot on screen device
+with(faithful, plot(eruptions, waiting))  
+ 
+## Add a main title
+title(main = "Old Faithful Geyser data")  
+ 
+## Copy my plot to a PNG file
+dev.copy(png, file = "geyserplot.png")  
+
+## Don't forget to close the PNG device!
+dev.off()  
+
+```
