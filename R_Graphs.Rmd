@@ -1,0 +1,713 @@
+---
+title: "R_Graphs"
+author: "Mr. Sachin B."
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Plotting Systems
+There are three different plotting systems in R and they each have different characteristics and modes of operation.
+
+They three systems are:
+
+1. Base Plotting System
+2. Lattice System
+3. ggplot2 System
+  
+#### 1.1. Base Plotting System
+* It is oldest system in R and come with original version of R.
+* Conceptual model for building plot is 'Artist's Palette' model. which means 'Start with blank canvas and built up from there'
+  * First, Create box with some points in it.
+  * then, add labels and then add regression line.
+  * then, title, axis ticks etc.
+* To do this, 'Start with `plot()` function' that generate plot.
+* Then there are other functions that so called, Annotate the plot.
+  * eg: text, lines, labels etc.
+ 
+```{r}
+ data(cars)
+ 
+ ## Create the plot / draw canvas
+ with(cars, plot(speed, dist))
+ 
+ ## Add annotation
+ title("Speed vs. Stopping distance")
+ 
+```
+
+#### 1.2. Lattice System
+* The lattice plotting system is implemented in the lattice package which comes with every installation of R (although it is not loaded by default).
+* Instead of piecing a plot together one by one through a series of commands, every plot is constructed with a series of commands, every plot is constructed with a **Single Function Call**
+ * eg: `xyplot()`, `bwplot()` etc.
+ * then, add labels and then add regression line.
+ * then, title, axis ticks etc.
+ 
+```{r}
+library(lattice)
+
+state <- data.frame(state.x77, region = state.region)
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
+ 
+```
+
+#### 1.3. ggplot2 System
+* This comes from the grammar of graphics which lays out a set of principles for a kind of plotting and creates a kind of language or grammar for describing  different aspects of a plot.
+* The ggplot2 system is implemented in the ggplot2 package, which is available from CRAN (it does not come with R).
+* It split the difference between base and lattice system so it mixes ideas from both.
+  * One hand, You can build plot incrementally by adding things one by one just like *base system*.
+  * On the other hand, Lot of aesthetic calculations are done automatically without you having to directly control such as 'spacing' & 'labels' are putting in the right place just like *lattice system*
+ * eg: `qplot()` function in *ggplot2*.
+ * then, add labels and then add regression line.
+ * then, title, axis ticks etc.
+ 
+```{r}
+library(ggplot2)
+
+data(mpg)
+qplot(displ, hwy, data = mpg)
+ 
+```
+
+### 2. graphics and grDevices Packages
+
+The core plotting and graphic engine in R is encapsulated in the following packages:
+
+1. graphics: Contains plotting functions for the 'base' graphics system including `plot()`,`hist()`,`boxplot()` and many more
+
+2. grDevices: Contains all the code implementing the various graphics devices including `windows()`,`pdf()`,`png()` etc.
+
+
+### 3. graphics package
+
+### 3.1. Histogram
+```{r}
+
+# 100 random numbers using  normal distribution 
+x<-rnorm(100)
+
+# Histogram
+hist(x)
+
+```
+
+### 3.2. Scatter Plot
+```{r}
+
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y)
+
+# Scatter Plot Practice
+a <- rnorm(100)
+b <- rnorm(100)
+plot(a,b)
+
+```
+
+### 3.3. Plot Parameter
+
+#### 3.3.1 `Margin`
+```{r}
+
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot Before Applying Margin (Default Margin)
+plot(x,y)
+```
+
+```{r}
+# Adding Margin to Scatter Plot
+par(mar = c(2,2,2,2))
+
+# Scatter Plot After Applying Margin
+plot(x,y)
+
+```
+
+
+#### 3.3.2 `pch`
+```{r}
+
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+
+# Scatter Plot using pch=20
+plot(x,y,pch=20)
+
+# Scatter Plot using pch=15
+plot(x,y,pch=15)
+
+# Scatter Plot using pch=10
+plot(x,y,pch=10)
+
+# Scatter Plot using pch=5
+plot(x,y,pch=5)
+```
+
+#### To know more about pch symbol
+```{r eval=FALSE }
+example("points")
+```
+
+#### 3.3.3 `title`
+
+##### Approach 1
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y)
+
+# Adding Title to Plot
+title("My Scatterplot 1")
+
+```
+
+##### Approach 2
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot along with title
+plot(x,y, main="Scatterplot 2")
+
+```
+
+#### 3.3.4 `text`
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y,pch=8)
+
+# Adding Text in a Plot
+text(-2,-1,"MyText")
+
+```
+
+#### 3.3.5 `legend`
+```{r}
+# 100 random numbers using  normal distribution 
+x <- rnorm(100)
+y <- rnorm(100)
+
+# Scatter Plot
+plot(x,y,pch=8)
+
+# Adding Legend to a Plot
+legend("topleft",legend = "Data", pch = 8)
+
+```
+
+#### 3.3.6 `abline`
+`abline` function adds one or more straight lines through the current plot.<br>
+
+The basic syntax is of abline() is as follows:<br>
+
+`abline(a=NULL, b=NULL, h=NULL, v=NULL, …)`
+
+- a, b: single values that specify the intercept`(a)` and slope`(b)` of the line
+- h: the y-value for the horizontal line
+- v: the x-value for the vertical line
+```{r}
+#define dataset
+
+df <- data.frame(x = c(1,1,2,3,4,4,5,6,7,7,8,9,10,10,11),
+                 y = c(12,13,16,11,22,24,25,24,24,27,30,32,35,38,40))
+
+#plot x and y values in dataset
+plot(df$x, df$y, pch = 15)
+```
+
+##### 3.3.6.1 `abline`:`Horizontal Line`
+
+```{r}
+# To add a horizontal line at the value y = 25
+plot(df$x, df$y, pch = 15)
+
+abline(h = 25, col = 'blue', lwd = 2)
+```
+
+The following code illustrates how to add a horizontal solid line at the mean value of y along with two horizontal dashed lines at one standard deviation above and below the mean value
+
+
+- Note that lwd = 2 specifies that we want the line width to be equal to 2 (default = 1).
+
+- Note that lty = 2 specifies that we want the line to be dashed.
+
+```{r}
+#create scatterplot for x and y
+plot(df$x, df$y, pch = 18)
+
+#create horizontal line at mean value of y
+abline(h = mean(df$y), col='blue', lwd = 2)
+
+#create horizontal lines at one standard deviation above and below the mean value
+abline(h = mean(df$y) + sd(df$y), col = 'red', lwd = 3, lty = 2)
+abline(h = mean(df$y) - sd(df$y), col = 'red', lwd = 3, lty = 2)
+
+```
+
+##### 3.3.6.2 `abline`:`Vertical Line`
+```{r}
+# To add a vertical line at the value x = 6
+plot(df$x, df$y, pch = 15)
+
+abline(v = 6, col = 'blue', lwd = 2)
+```
+
+The following code illustrates how to add a vertical line at the mean value on a histogram
+
+```{r}
+
+#make this example reproducible
+set.seed(0)
+
+#create dataset with 1000 random values normally distributed with mean = 10, sd = 2
+data <- rnorm(1000, mean = 10, sd = 2)
+
+#create histogram of data values
+hist(data, col = 'steelblue')
+
+#draw a vertical dashed line at the mean value
+abline(v = mean(data), lwd = 3, lty = 2)
+
+```
+
+##### 3.3.6.3 `abline`:`Regression Line`
+
+The basic code to add a simple linear regression line to a plot in R is: `abline(reg_model)`
+
+- where `reg_model` is a fitted regression line created by using the `lm()` function.
+
+The following code illustrates how to add a fitted linear regression line to a scatterplot
+
+```{r}
+#create scatterplot of x and y values
+plot(df$x, df$y)
+
+#fit a linear regression model to the data
+reg_model <- lm(y ~ x, data = df)
+
+#add the fitted regression line to the scatterplot
+abline(reg_model)
+
+```
+
+Note that we simply need a value for the intercept and the slope to fit a simple linear regression line to the data using the abline() function. 
+
+Thus, another way (although a more tedious way) of using abline() to add a regression line is to explicitly specify the intercept and slope coefficients of the regression model:
+
+```{r}
+#define dataset
+df <- data.frame(x = c(1,1,2,3,4,4,5,6,7,7,8,9,10,10,11),
+                 y = c(12,13,16,11,22,24,25,24,24,27,30,32,35,38,40))
+
+#plot x and y values in dataset
+plot(df$x, df$y, xlim = c(0,10), ylim = c(0,40))
+
+#fit a linear regression model to the data
+reg_model <- lm(y ~ x, data = df)
+print(reg_model)
+print(class(reg_model))
+print(typeof(reg_model))
+
+#define intercept and slope values
+a <- coefficients(reg_model)[1] #intercept
+b <- coefficients(reg_model)[2] #slope
+
+print(a)
+print(b)
+
+#add the fitted regression line to the scatterplot
+abline(a=a, b=b)
+
+```
+
+### Slope and intercept of the regression line
+- Slope indicates the steepness of a line 
+- Intercept indicates the location where it intersects an axis
+- The slope and the intercept define the linear relationship between two variables, and can be used to estimate an average rate of change.
+- The greater the magnitude of the slope, the steeper the line and the greater the rate of change.
+
+```{r}
+
+# y=2+5x
+plot(1,type = "n", xlab = "The slope is positive 5. When x increases by 1, y increases by 5.The y-intercept is 2.",ylab = "",  xlim = c(0,4), ylim = c(0,20))
+
+text(1,10,"y=2+5x")
+abline(a=2, b=5)
+
+# y=7.2-0.4x
+plot(1,type = "n", xlab = "The slope is negative 0.4. When x increases by 1, y decreases by 0.4. The y-intercept is 7.2.",ylab = "",  xlim = c(0,4), ylim = c(0,8))
+
+text(1,6,"y=7.2-0.4x")
+abline(a=7.2, b=-0.4)
+
+# y=-4
+plot(1,type = "n", xlab = "The slope is 0. When x increases by 1, y neither increases/decreases. The y-intercept is -4.",ylab = "",  xlim = c(0,4), ylim = c(1,-5))
+
+text(1,-3.5,"y=-4")
+abline(a=-4, b=0, col="blue")
+
+```
+Usually, this relationship can be represented by the equation $y = b_0 + b_1x$, where $b_0$ is the $y-intercept$ and $b_1$ is the $slope$.<br><br>
+
+#### Example
+A company determines that job performance for employees in a production department can be predicted using the regression model $y = 130 + 4.3x$ <br>
+where,
+
+- $x$ is the hours of in-house training they receive (from 0 to 20)
+- $y$ is their score on a job skills test.
+
+- The value of the $y-intercept$ ($130$) indicates the average job skill score for an employee with no training.
+- The value of the $slope$ ($4.3$) indicates that for each hour of training, the job skill score increases, on average, by $4.3$ points.
+
+
+```{r}
+
+# y=130+4.3x
+plot(1,type = "n", xlab = "hours of in-house training",ylab = "score on a job skills test",  xlim = c(0,15), ylim = c(120,220))
+
+title("Job Performance Prediction Model")
+
+text(5,135,"y=130+4.3x")
+abline(a=130, b=4.3, col="red")
+grid (3,5, lty = 6, col = "cornsilk2")
+
+```
+
+### 3.4. Multiple Plot in Single Canvas
+
+- `mfrow()`
+- `mfcol()`
+
+```{r}
+
+# 100 random numbers 
+x <- rnorm(100)
+y <- rnorm(100)
+z <- rpois(100,2)
+
+```
+
+#### 3.4.1. Multiple Plot: 2-rows & 1-column
+```{r}
+par(mfrow = c(2,1))
+plot(x,y,pch=20)
+plot(x,z,pch=20)
+```
+
+#### 3.4.2. Multiple Plot: 1-rows & 2-columns
+```{r}
+
+par(mfrow = c(1,2))
+plot(x,y,pch=20)
+plot(x,z,pch=20)
+
+```
+
+#### 3.4.3. Multiple Plot (row-wise): 2-rows & 2-columns
+```{r}
+
+par(mfrow = c(2,2))
+plot(x,y,pch=20, main = "First")
+plot(x,z,pch=20, main = "Second")
+plot(y,x,pch=20, main = "Third")
+plot(z,x,pch=20, main = "Forth")
+
+```
+
+#### 3.4.4. Multiple Plot (column-wise): 2-rows & 2-columns
+```{r}
+
+par(mfcol = c(2,2))
+plot(x,y,pch=20, main = "First")
+plot(x,z,pch=20, main = "Second")
+plot(y,x,pch=20, main = "Third")
+plot(z,x,pch=20, main = "Forth")
+
+```
+
+### 3.5. Points Variable
+
+```{r}
+
+# Plot of random numbers
+x <- rnorm(100)
+y <- x + rnorm(100)
+
+plot(x,y)
+
+# Factor Object containing Male and Female data
+
+g <- gl(2,50, labels = c("Male","Female"))
+
+print(g)
+```
+
+```{r}
+
+# Blank Plot
+plot(x,y, type = "n")
+
+# Add Male points to graph
+points(x[g=="Male"],y[g=="Male"], col = "light blue",pch=19)
+
+# Add Female points to graph
+points(x[g=="Female"],y[g=="Female"], col = "pink", pch=19)
+
+```
+
+### 4. 'grDevice' package
+
+### 4.1. What is Graphic Device?
+ 
+A graphics device is something where you can make a plot appear
+
+- A window on your computer (screen device)
+- A PDF file (file device)
+- A PNG or JPEG file (file device)
+- A scalable vector graphics (SVG) file (file device)
+
+When you make a plot in R, it has to be "sent" to a specific graphics device.
+
+1. The most common place for a plot to be "sent" is the **screen device**
+    i) Screen device on **Mac** is launched with the `quartz()`
+    ii) Screen device on **Windows** is launched with `windows()`
+    iii) Screen device on **Unix/Linux** is launched with `x11()` <br>
+    Note: There is only one screen device on a Platform (Windows, Mac, Unix/Linux).
+2. For plots that may be printed out or be incorporated into a document (e.g. Papers/Reports, Slide Presentation), a **file device** is useful.
+    i) `pdf()`
+
+### 4.2. How to create Plot
+I. Creating plot on **screen device**. <br>
+II. Creating plot on **file device**.
+  
+#### I. Creating plot on 'screen device'
+1. call a plotting Function 
+    - `plot()` in **base**, e.g. `plot(x,y)`, 
+    - `xyplot()` in **lattice**, or 
+    - `qplot()` in **ggplot2** will default to sending a plot to the screen device
+2. Plot appears on the **screen device**
+3. Annotate plot if necessary
+    - `title(main= "Old Faithful Geyser data")`
+
+```{r}
+
+library(datasets)
+
+with(faithful,plot(eruptions,waiting)) ## Make plot appear on screen device
+title(main= "Old Faithful Geyser data") ## Annotate plot
+
+```
+
+#### II. Creating plot on 'file device'
+1. Explicitly launch a graphics device
+    - `pdf(file="myplot.pdf")`
+2. call a plotting Function (**Note:if you are using a file device, no plot will appear on the screen** )
+    - `plot()` in **base** e.g. `plot(x,y)`, 
+    - `xyplot()` in **lattice**, or 
+    - `qplot()` in **ggplot2**
+3. Annotate plot if necessary
+    - `title(main= "Old Faithful Geyser data")`
+4. Explicitly close graphics  device with `dev.off()` (**Note:This is very important step**)
+
+```{r}
+
+library(datasets)
+
+pdf(file = "myplot.pdf") ## Open PDF file; create 'myplot.pdf' in working directory
+
+with(faithful,plot(eruptions,waiting)) ## Create plot and send to a file (no plot appears on screen device)
+
+title(main= "Old Faithful Geyser data") ## Annotate plot; still nothing on screen
+
+dev.off() ## Close the PDF file device; Now the 'myplot.pdf' will appear on the screen.
+
+```
+
+### 4.3. Multiple Open Graphics Devices
+It is possible to open multiple graphics devices (screen, file, or both).<br>
+The **currently active graphics device** can be found by calling `dev.cur()` <br>
+Every open graphics device is assigned an integer starting with 2 (there is no graphics device 1).<br>
+You can change the active graphics device with `dev.set(<integer>)`
+
+```{r}
+# Open first device and plot data1
+windows()
+data1 <- 1:10
+plot(data1,main="FIRST")
+ 
+# Open second device and plot data2
+windows()
+data2 <- rnorm(10)
+plot(data2, main="SECOND")
+
+
+# 1. Currently active device `dev.cur()`
+dev.cur()
+
+# 2. Setting active device `dev.set(<integer>)`
+
+## set active device and draw line1
+dev.set(3)
+abline(0,1, col = "red")
+
+# 3. Switching active device `dev.prev()` & `dev.next()`
+
+## Switch active device and draw line2
+dev.set(dev.next())
+abline(h = mean(data2), col = "red")
+
+## Switch active device and draw legend
+dev.set(dev.prev())
+abline(0,1, col = "green", lwd=5)
+legend("topleft",legend = "Data", pch = 1)
+
+```
+
+### 3.4. Copying Plots
+The `dev.copy()` can be used to copy a plot from one device to another.
+
+```{r}
+library(datasets)
+ 
+## Create plot on screen device
+with(faithful, plot(eruptions, waiting))  
+ 
+## Add a main title
+title(main = "Old Faithful Geyser data")  
+ 
+## Copy my plot to a PNG file
+dev.copy(png, file = "geyserplot.png")  
+
+## Don't forget to close the PNG device!
+dev.off()  
+
+```
+
+### 5. Exploratory Graphs
+
+Why do we use graphs in data analysis?
+- To understand data properties
+- To find patterns in data
+- To suggest modeling strategies (use Linear/Non-linear Model)
+- To 'debug' analysis (To see whats going wrong)
+- To communicate results (To present result to peoples in the form of graphs)
+
+Exploratory graphs are usually made very quickly and a lot of them are made in the process of checking out the data.
+
+The goal of making exploratory graphs is usually developing a personal understanding of the data and to prioritize tasks for follow up.
+
+### Case Study: Air Pollution in the United States
+
+### Annual average PM2.5 averaged over the period 2008 through 2010
+
+```{r}
+pollution <- read.csv("data/avgpm25.csv", colClasses = c("numeric","character","factor","numeric","numeric"))
+head(pollution)
+```
+
+#### Q. Do any states exceeds the standard of 12 mu g/m^3
+
+* Simple Summaries of Data
+  * One Dimension
+  * Two Dimension and Beyond
+  
+#### I. One Dimension
+1. Five Number Summary
+2. Box plot
+3. Histograms
+4. Density Plot
+5. Bar Plot
+
+##### 1. Five Number Summary
+```{r}
+  summary(pollution$pm25)
+```
+##### 2. Box Plot
+```{r}
+  boxplot(pollution$pm25, col = "blue")
+
+    # Overlaying Feature
+  
+    boxplot(pollution$pm25, col = "blue")
+    abline(h=12)
+  
+    boxplot(pollution$pm25, col = "blue")
+    abline(h=c(11,12,13))
+```
+
+##### 3. Histograms
+```{r}  
+  hist(pollution$pm25, col = "green")
+  rug(pollution$pm25)
+  
+    # Histogram with change breaks
+  
+    hist(pollution$pm25, col = "green", breaks = 100)
+    rug(pollution$pm25)
+  
+    # Overlaying Feature
+  
+    hist(pollution$pm25, col = "green")
+    abline(v = 12,lwd = 2)
+    abline(v = median(pollution$pm25), col = "magenta", lwd = 4)
+```
+
+##### 4. Bar plot
+```{r} 
+  barplot(table(pollution$region), col = "wheat", main = "Number of Counties in Each Region")
+```
+
+#### II. 2-Dimensional Graphs
+
+```{r}
+pollution <- read.csv("data/avgpm25.csv", colClasses = c("numeric","character","factor","numeric","numeric"))
+head(pollution)
+```
+
+##### 1. Multiple Boxplots
+```{r}
+  boxplot(pm25 ~ region,data = pollution, col = "red")
+```  
+
+##### 2. Multiple Histograms
+```{r}  
+  par(mfrow = c(2,1),mar = c(4,4,2,1) )
+  hist(subset(pollution, region == "east")$pm25, col = "green")
+  hist(subset(pollution, region == "west")$pm25, col = "green")
+```
+
+##### 3. Scatterplot
+```{r}  
+  with(pollution, plot(latitude, pm25))
+  abline(h = 12, lwd = 2, lty = 2)
+  
+  # 3.1 Scatterplot - Using Color
+  with(pollution, plot(latitude, pm25, col = region))
+  abline(h = 12, lwd = 2, lty = 2)
+   
+  # 3.2 Multiple Scatterplots
+  par(mfrow = c(1,2),mar = c(5,4,2,1) )  
+  with(subset(pollution, region == "west"), plot(latitude, pm25, main = "west"))
+  with(subset(pollution, region =="east"), plot(latitude, pm25, main="East"))
+```  
