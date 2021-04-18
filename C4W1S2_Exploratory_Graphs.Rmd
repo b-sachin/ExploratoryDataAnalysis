@@ -1,0 +1,176 @@
+---
+title: "C4W1S2"
+author: "Mr. Sachin B."
+date: "17/04/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### 1. Load 'Pollution' dataset
+To demonstrate these ideas, we've copied some data for you from the U.S. Environmental Protection Agency (EPA) which sets national ambient air quality standards for outdoor air pollution. These Standards say that for fine particle pollution (PM2.5), the "annual mean, averaged over 3 years" cannot exceed 12 micro grams per cubic meter. We stored the data from the U.S. EPA web site in the data frame pollution.
+```{r}
+pollution<-read.csv("pollution.csv")
+```
+
+### 2. See How really data looks? No. of rows & columns and Summary of data
+
+#### 2.1. See How really data looks?
+```{r}
+head(pollution) 
+```
+
+#### 2.2. No. of rows & columns
+```{r}
+dim(pollution) 
+```
+
+#### 2.3. Summary & quantile of data
+```{r}
+# 1.
+    summary(pollution$pm25)
+
+# 2.
+    ppm<-pollution$pm25
+    
+    quantile(ppm)
+```
+
+### 3. Boxplot
+The boxplot shows us the same quartile data that summary and quantile did.The lower and upper edges of the blue box respectively show the values of the 25% and 75% quantiles.<br>
+
+The "whiskers" of the box (the vertical lines extending above and below the box) relate to the range parameter of boxplot, which we let default to the value 1.5 used by R. The height of the box is the interquartile range, the difference between the 75th and 25th quantiles. In this case that difference is 2.8. The whiskers are drawn to be a length of range \*2.8 or 1.5\*2.8. This shows us roughly how many, if any, data points are outliers, that is, beyond this range of values.
+
+```{r}
+boxplot(ppm, col="blue")
+```
+
+#### 3.1. abline()
+you can add to (annotate) an existing plot
+```{r}
+boxplot(ppm, col="blue")
+
+abline(h=12)
+```
+
+### 4. Histogram
+The histogram gives us a little more detailed information about our data,specifically the distribution of the pollution counts, or how many counties fall into each bucket of measurements.
+
+```{r}
+hist(ppm,col="green")
+
+
+# Histogram with smaller bucket size
+hist(ppm,col="green",breaks = 100)
+```
+
+#### 4.1. rug()
+This one-dimensional plot, with its grayscale representation, gives you a little more detailed information about how many data points are in each bucket and where they lie within the bucket.
+```{r}
+hist(ppm,col="green")
+
+rug(ppm)
+```
+
+#### 4.2. abline() & Line width(lwd)
+To see the vertical line at 12 with line width 2
+```{r}
+hist(ppm,col="green")
+
+abline(v=12,lwd=2)
+
+```
+
+Run abline with the argument `v` equal to `median(ppm)`, the argument `col` equal to "magenta", and the argument `lwd` equal to 4.
+To see the vertical line at 12 with line width 2px
+```{r}
+hist(ppm,col="green")
+
+abline(v=median(ppm),col="magenta",lwd=4)
+
+```
+
+### 5. Bar Plots
+barplot is another type of one-dimensional summary to plot the information.
+
+```{r}
+# Longitude and latitude don't sound interesting, and each fips is unique since it identifies states (first 2 digits) and counties (last 3 digits). Let's look at the region column to see what's there. Run the R command table on this column. Use the construct pollution$region. Store the result in the variable reg.
+
+reg<- table(pollution$region)
+
+reg
+
+# Barplot
+barplot(reg,col="wheat",main="Number of Counties in Each Region")
+```
+
+### 6. Multiple Boxplots
+```{r}
+# We use the R formula y ~ x to show that y (in this case pm25) depends on x (region). Since both come from the same data frame (pollution) we can specify a data argument set equal to pollution. By doing this, we don't have to type pollution$pm25 (or ppm) and pollution$region. We can just specify the formula pm25~region.
+
+boxplot(pm25~region,data=pollution,col="red")
+```
+
+### 7. Multiple Histograms
+```{r}
+# We can plot multiple histograms in one plot, though to do this we have to use more than one R command. 
+# First we have to set up the plot window with the R command par which specifies how we want to lay out the plots, say one above the other. 
+#We also use par to specify margins, a 4-long vector which indicates the number of lines for the bottom, left, top and right.
+
+par(mfrow=c(2,1),mar=c(4,4,2,1))
+
+# 1st Histogram
+east<-subset(pollution,region=="east")
+head(east)
+
+hist(east$pm25,col="green")
+
+# 2nd Histogram
+hist(subset(pollution,region=="west")$pm25,col="green") # without 'west' variable
+
+# west variable
+west<-subset(pollution,region=="west")
+
+```
+
+### 8. Scatter Plot
+Scatter plots are two-dimensional plots which show the relationship between two variables, usually x and y.
+```{r}
+# Let's look at a scatterplot showing the relationship between latitude and the pm25 data.
+
+with(pollution,plot(latitude,pm25,col="blue"))
+
+# 2. 
+plot(pollution$latitude,pollution$pm25,col="red")
+```
+
+#### 8.2. abline(), lwd & lty
+To see the horizontal line at 12 with line width 2 and line type 'dashed'
+```{r}
+with(pollution,plot(latitude,pm25))
+
+abline(h=12,lwd=2,lty=2)
+
+```
+
+### 9. Two scatterplots distinguished by region factor using Color 'col=pollution$region'
+```{r eval=FALSE}
+plot(pollution$latitude,ppm,col=pollution$region)
+
+abline(h=12,lwd=2,lty=2)
+```
+
+### 10. Two scatterplots distinguished by region (plot the scatterplots side by side)
+```{r}
+# plot the scatterplots side by side (one row and two columns) and modified margin
+par(mfrow = c(1, 2), mar = c(5, 4, 2, 1))
+
+#West
+plot(west$latitude, west$pm25, main = "West")
+
+#East
+plot(east$latitude, east$pm25, main = "East")
+```
