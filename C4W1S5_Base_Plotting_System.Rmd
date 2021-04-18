@@ -1,0 +1,211 @@
+---
+title: "Base Plotting System(Swirl)"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Base Plotting System
+
+The core plotting and graphics engine in R is encapsulated in two packages.
+
+1. The first is the `graphics` package 
+    - which contains plotting functions for the "base" system.
+    - The functions in this package include `plot`, `hist`, `boxplot`, `barplot`, etc.
+2. The second package is `grDevices`
+    - which contains all the code implementing the various graphics devices, including X11, PDF, PostScript, PNG, etc.
+    
+### 2. Base 'graphics' package
+- Base graphics are often constructed piecemeal, with each aspect of the plot handled separately through a particular function call.
+    - Usually you start with a plot function (such as `plot`, `hist`, or `boxplot`), 
+    - then you use annotation functions (`text`, `abline`, `points`) to add to or modify your plot.
+- Calling a basic routine such as `plot(x, y)` or `hist(x)` launches a `graphics device` (if one is not already open) and draws a new plot on the device.
+    - If the arguments to `plot` or `hist` are not of some special class, then the default method is called.
+- Most of the base plotting functions have many arguments,
+    - for example, setting the title, labels of axes, plot character, etc. 
+    - Some of the parameters can be set when you call the function or they can be added later in a separate function call.
+    
+### 3. Histogram
+We'll use the dataset airquality (part of the library datasets) which we've loaded for you. This shows ozone and other air measurements for New York City for 5 months in 1973.
+```{r}
+# to see what the data looks like.
+head(airquality)
+
+# Understand range of values in Ozone column excluding 'NA'.
+range(airquality$Ozone,na.rm = TRUE)
+
+# simple histogram of this ozone column to show the distribution of measurements.
+hist(airquality$Ozone)
+```
+
+### 4. Boxplot
+
+```{r}
+
+# Understand no. of values in each Month.
+table(airquality$Month)
+
+# boxplot of 'ozone' as a function of the 'Month'
+boxplot(Ozone~Month,airquality)
+
+# Let's call boxplot again to specify labels. 
+# We'll add more arguments to the call to specify labels for the 2 axes. ## Set xlab equal to "Month" and ylab equal to "Ozone (ppb)".
+## Specify col.axis equal to "blue" and col.lab equal to "red".
+
+boxplot(Ozone~Month, airquality, xlab = "Month", ylab = "Ozone (ppb)", col.axis = "blue", col.lab = "red")
+
+# Use the argument main set equal to the string "Ozone and Wind in New York City".
+
+title(main = "Ozone and Wind in New York City")
+```
+
+### 5. Scatter Plot
+
+```{r}
+# We'll show the relationship between Wind (x-axis) and Ozone (y-axis). # We'll use the function plot with those two arguments (Wind and Ozone, in that order).
+
+with(airquality,plot(Wind,Ozone))
+
+# Add Title
+
+title(main = "Ozone and Wind in New York City")
+
+```
+
+### 6. par()
+
+- The basic plotting parameters are documented in the R help page for the function `par`.
+- You can use `par` to set parameters OR to find out what values are already set.
+
+
+```{r}
+# To see just how much flexibility we have, we will run the R command `length` with the argument `par()` now.
+length(par())
+
+# R function `names` with `par()` as its argument to see what these parameters are.
+names(par())
+
+# Default Value for Plot dimensions in inches
+par()$pin
+#OR
+par("pin")
+
+# Default Color for Foreground
+par("fg")
+
+# The plot character default is the open circle, but it "can either be a single character or an integer code for one of a set of graphics symbols."
+par("pch")
+
+# par("lty") to see the default line type
+par("lty")
+```
+
+#### 6.1. Color
+- The plotting color, specified as a number, string, or hex code;
+- the `colors()` function gives you a vector of colors by name.
+```{r eval=FALSE}
+colors()
+```
+
+#### 6.2. How to reset 'par' values to default
+
+- The par() function is used to specify global graphics parameters that affect all plots in an R session.
+- These parameters can be overridden when specified as arguments to specific plotting functions.
+    - These include las (the orientation of the axis labels on the plot),
+    - bg (background color), 
+    - mar (margin size), 
+    - oma (outer margin size), 
+    - mfrow and mfcol (number of plots per row, column).
+- **Use `dev.off` or `plot.new` to reset to the defaults**.
+
+
+### 7. type = "n"
+This tells R to set up the plot but not to put the data in it.
+```{r}
+plot(airquality$Wind,airquality$Ozone, type = "n")
+
+# Add a title with the argument main set equal to the string "Wind and Ozone in NYC"
+
+title("Wind and Ozone in NYC")
+```
+
+#### 7.1. Adding 'points' to blank plot alongwith 'legend' & 'abline'
+```{r}
+# Repeating from earlier command
+plot(airquality$Wind,airquality$Ozone, type = "n")
+title("Wind and Ozone in NYC")
+
+# Now create a variable called `may` by subsetting airquality appropriately.
+
+may <- subset(airquality,Month==5)
+
+# R command points to plot May's wind and ozone (in that order) as solid blue triangles.
+
+points(may$Wind,may$Ozone,col="blue",pch=17) # pch=17 for Solid Triangle
+
+# Now create the variable `notmay` by subsetting airquality appropriately.
+notmay<- subset(airquality,Month!=5)
+
+# R command points to plot these notmay's wind and ozone (in that order) as red snowflakes.
+
+points(notmay$Wind,notmay$Ozone,col="red",pch=8)  # pch=8 for snowflakes
+
+# R command `legend` to clarify the plot and explain what it means.
+  ## The first arg will be the string "topright" to tell R where to put the legend.
+  ## The remaining 3 arguments will each be 2-long vectors created by R's concatenate function, e.g., c(). These arguments are pch, col, and legend.
+
+legend("topright",pch = c(17,8),col = c('blue','red'),legend = c("May","Other Months"))
+
+# add a vertical line at the median of airquality$Wind. Make it dashed
+abline(v=median(airquality$Wind),lty=2,lwd=2) # lty=2 for dashed line.
+```
+
+### 8. Multiple Plots
+- The last two, `mfrow` and `mfcol`, both deal with multiple plots in that they specify the number of plots per row and column.
+- The difference between them is the order in which they fill the plot matrix. 
+    - The call `mfrow` will fill the rows first
+    - `mfcol` fills the columns first.
+    
+```{r}
+# Use par with the parameter mfrow set equal to the vector (1,2) to set up the plot window for two plots side by side.
+
+par(mfrow=c(1,2))
+
+# First Plot: plot airquality$Wind and airquality$Ozone and use main to specify the title "Ozone and Wind".
+
+plot(airquality$Wind,airquality$Ozone, main = "Ozone and Wind")
+
+# Second Plot: Plot airquality$Ozone and airquality$Solar.R and use main to specify the title "Ozone and Solar Radiation".
+
+plot(airquality$Ozone,airquality$Solar.R, main = "Ozone and Solar Radiation")
+```
+
+#### 8.1. 'margin' ('mar' & 'oma') & 'mtext'
+
+This one with 3 plots, to illustrate inner and outer margins.
+
+- Margins are specified as 4-long vectors of integers.
+    - Each number tells how many lines of text to leave at each side.
+    - The numbers are assigned clockwise starting at the bottom.
+    - The default for the inner margin is c(5.1, 4.1, 4.1, 2.1) so you can see we reduced each of these so we'll have room for some outer text.
+```{r}
+par(mfrow = c(1,3), mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+
+# Add 3 Plots
+
+## Plot 1
+plot(airquality$Wind,airquality$Ozone, main = "Ozone and Wind")
+
+## Plot 2
+plot(airquality$Solar.R,airquality$Ozone, main = "Ozone and Solar Radiation")
+
+## Plot 3
+plot(airquality$Temp, airquality$Ozone, main = "Ozone and Temperature")
+
+
+# Since this is the main title, we specify it with the R command mtext.
+mtext("Ozone and Weather in New York City",outer = TRUE)
+```

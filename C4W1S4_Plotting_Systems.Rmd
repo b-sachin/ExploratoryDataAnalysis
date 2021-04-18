@@ -1,0 +1,84 @@
+---
+title: "Plotting Systems (Swirl)"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### 1. Base Plotting System
+
+- The first plotting system is the Base Plotting System which comes with R. 
+- It's the oldest system which uses a simple "Artist's palette" model.        - What this means is that you start with a blank canvas and build your plot up from there, step by step.
+- Usually you start with a `plot()` function (or something similar), then you use annotation functions to add to or modify your plot.
+- R provides many annotating functions such as `text`, `lines`, `points`, and `axis`.
+    - R provides documentation for each of these.
+    - They all add to an already existing plot.
+- The base system is very intuitive and easy to use when you're starting to do exploratory graphing and looking for a research direction.
+- You can't go backwards, though, say, if you need to readjust margins or fix a misspelled a caption.
+- A finished plot will be a series of R commands, so it's difficult to translate a finished plot into a different system.
+
+```{r}
+# to see what the data looks like.
+head(cars)
+
+#calling plot function
+with(cars,plot(speed,dist))
+
+# to add text to  the plot.
+text(mean(cars$speed),max(cars$dist),"SWIRL rules!")
+```
+
+### 2. Lattice System
+
+- The second plotting system, the Lattice System which comes in the package of the same name.
+- Unlike the Base System, lattice plots are created with a single function call such as `xyplot` or `bwplot`.
+- Margins and spacing are set automatically because the entire plot is specified at once.
+- The lattice system is most useful for conditioning types of plots which display how y changes with x across levels of z. 
+    - The variable z might be a categorical variable of your data.
+- This system is also good for putting many plots on a screen at once.
+<br>
+The lattice system has several disadvantages.
+1. First, it is sometimes awkward to specify an entire plot in a single function call. Annotating a plot may not be especially intuitive.
+2. Second, using panel functions and subscripts is somewhat difficult and requires preparation.
+3. Finally, you cannot "add" to the plot once it is created as you can with the base system.
+```{r}
+state = read.csv("state.csv")
+library(lattice)
+
+# to see what the data looks like.
+head(state)
+
+# to see how many categories there are and how many states are in each.
+table(state$region)
+
+# lattice command xyplot to see how life expectancy varies with income in each of the four regions.
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4,1))
+
+# Just for fun rerun the xyplot and this time set layout to the vector c(2,2)
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(2,2)) # No need for you to worry about margins or labels. The package took care of all that for you.
+```
+
+### 3. ggplot2 System
+
+- The last plotting system, ggplot2, which is a hybrid of the base and lattice systems.
+- It automatically deals with spacing, text, titles (as Lattice does) but also allows you to annotate by "adding" to a plot (as Base does), so it's the best of both worlds.
+- Although ggplot2 bears a superficial similarity to lattice, it's generally easier and more intuitive to use. 
+- Its default mode makes many choices for you but you can still customize a lot. 
+- The package is based on a "grammar of graphics" (hence the gg in the name), so you can control the aesthetics of your plots. 
+
+```{r}
+mpg = read.csv("mpg.csv")
+library(ggplot2)
+
+# to see what the data looks like.
+head(mpg)
+dim(mpg)
+
+# how many models of cars we're dealing with.
+table(mpg$model)
+
+# We're interested in the effect engine displacement (displ) has on highway gas mileage (hwy)
+qplot(displ,hwy,data = mpg)
+```
