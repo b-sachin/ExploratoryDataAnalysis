@@ -1,0 +1,270 @@
+---
+title: '"ggplot2"'
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. What	is	ggplot2?
+
+- An	implementation	of	the	Grammar	of	Graphics by	**Leland	Wilkinson**
+    - Written	by	**Hadley	Wickham**	
+- A	“Third”	graphics	system	for	R	(along	with	`base` and	`lattice`)	
+- Available	from	CRAN	via	`install.packages()`
+
+### 2. Grammar	of	Graphics
+
+- *"Grammar	of	graphics"*	represents	and	abstraction	of	graphics ideas/objects.
+    - Think	“*verb*”,	“*noun*”,	“*adjective*”	for	graphics.
+- Allows	for	a	“theory”	of	graphics	on	which	to build	new	graphics	and	graphics	objects	
+    - “Shorten	the	distance	from	mind	to	page”
+
+- *ggplot2* book states:
+  - “In	brief,	the	grammar	tells	us that	a	statistical graphic	is	a mapping	from	data	to
+    - *aesthetic attributes*	(**color,	shape,	size**)	of
+    - *geometric objects*	(**points,	lines,	bars**).
+    
+    The	plot	may	also	contain	statistical	transformations	of	the	data and	is	drawn	on	a	specific	coordinate	system”
+
+### 3. qplot()
+
+- Works	much	like	the	`plot`	function	in	base graphics	system.
+- Looks	for	data	in	a	'data	frame',	similar	to	`lattice`,	or	in	the	parent	environment.
+- Plots	are	made	up	of
+  - ***aesthetics***	(**color,	shape,	size**)	and
+  - ***geoms***	(**points,	lines,	bars**)
+- '*Factors*'	are	important	for	indicating	subsets	of the	data (if they	are	to have	different	properties);
+  - they	should	be	**labeled**
+- The	`qplot()`	hides	what	goes	on	underneath,	which	is	okay	for	most	operations
+- **`ggplot()` is the	core function	and	very	flexible for	doing	things	`qplot()`	cannot	do**	
+
+#### 3.1. Example:
+```{r}
+# Load 'ggplot2'package
+library(ggplot2)
+
+# Structure of 'mpg'
+str(mpg)
+
+# qplot
+qplot(displ,hwy,data=mpg)
+
+```
+
+#### 3.2. Modifying Aesthetics (color, shape, size)
+```{r}
+
+# qplot
+qplot(displ,hwy,data=mpg, color= drv) # color is factor variable 'drv'
+# legent is auto generated and placed.
+```
+
+#### 3.3. Adding a geom (point, line, bar)
+```{r}
+
+# qplot with geom
+qplot(displ,hwy,data=mpg, geom = c("point","smooth"))
+
+```
+
+`geom`:
+
+1. "`point`" -> data in black points
+2. "`smooth`" -> blue line that goes across and the 95% confidence intervals for that line are indicated by the gray zone.
+
+#### 3.4. Histograms
+```{r}
+
+# qplot with one variable (Histogram)
+qplot(hwy,	data	=	mpg,	fill	=	drv)
+
+```
+
+#### 3.5. Facets
+`Facets` are like panels in `lattice`.
+  
+  - The idea is that you can create separate plots,which are subsets of your data indicated by a factor variable.
+  - You can make a panels of plots to look at separate subsets together.
+    -  One option to be to color code the subsets according to different colors.(That we did in Histogram)
+    - Easy way to split out groups into separate panels and make separate plots.
+    
+**Syntax:** ***no. of row (factor levels) ~ no. of columns (factor levels)***
+<br>**Example:** ***.~drv*** (means no variable on the left that indicates no. of rows that is why "." is there and right hand side variable "drv" indicates 3 factor levels 4-wheel, front-wheel and rear-wheel drive hence 3 columns)
+```{r}
+
+# qplot with Facets (Scatterplots)
+qplot(displ,hwy,data = mpg,facets = .~drv)
+
+# qplot with Facets (Histograms)
+qplot(hwy,data=mpg,facets = drv~.,binwidth=2)
+```
+
+### 4.Case Study
+
+MAACS	Cohort
+
+- Mouse	Allergen and Asthma Cohort Study	
+- Baltimore	children	(aged	5—17)
+- Persistent asthma,	exacerbation	in	past	year
+- Study	indoor environment	and	its	relationship with	asthma	morbidity
+
+
+```{r}
+# Load Data
+load("C:/Users/admin/Documents/ExploratoryDataAnalysis/data/maacs.Rda")
+str(maacs)
+```
+
+#### 4.1 Histogram of eNo
+```{r}
+qplot(log(eno),data = maacs)
+```
+
+#### 4.2 Histogram by Group
+```{r}
+qplot(log(eno),data = maacs,fill=mopos)
+```
+
+#### 4.3 Density Smooth
+```{r}
+qplot(log(eno),data = maacs,geom = "density")
+```
+
+```{r}
+qplot(log(eno),data = maacs,geom = "density",color=mopos)
+```
+
+#### 4.4 Scatterplots:	$eNO$	vs.	$PM_{2.5}$
+```{r}
+qplot(log(pm25),log(eno),data = maacs)
+```
+
+```{r}
+qplot(log(pm25),log(eno),data = maacs,shape=mopos)
+```
+
+```{r}
+qplot(log(pm25),log(eno),data = maacs,color=mopos)
+```
+
+```{r}
+qplot(log(pm25),log(eno),data = maacs,color=mopos,geom = c("point","smooth"),method="lm")
+```
+
+```{r}
+qplot(log(pm25),log(eno),data = maacs,geom = c("point","smooth"),method="lm",facets =.~mopos)
+```
+
+### 5. Basic	Components	of	a	'ggplot2'	Plot	
+
+- A	**data frame**
+- **aesthetic mappings**:	how	data are mapped	to ***color, size***
+- **geoms**: geometric	objects	like	***points,	lines,	shapes***.
+- **facets**: for ***conditional	plots***.
+- **stats**: statistical	transformations	like	***binning,	quantiles, smoothing***.
+- **scales**: what scale an aesthetic	map	uses (example: male = red, female = blue).
+- **coordinate system**	
+
+### 6. Building	Plots	with	ggplot2 (with Layers)
+
+- When building plots in `ggplot2` (rather than using `qplot`) the “artist’s	palette” model	may	be the closest analogy
+- Plots	are	built	up in layers	
+    – Plot the data	
+    – Overlay	a	summary	
+    – Metadata	and	annotation	
+
+#### Example:	BMI,	PM<sub>2.5</sub>,	Asthma
+
+- Mouse	Allergen and Asthma	Cohort Study
+- Baltimore	children (age	5-17)
+- Persistent asthma, exacerbation in past year
+- Does BMI (normal vs. overweight) modify the relationship between PM<sub>2.5</sub> and asthma symptoms?
+
+```{r}
+url <- "https://raw.githubusercontent.com/rdpeng/artofdatascience/master/manuscript/data/bmi_pm25_no2_sim.csv"
+download.file(url,"./data/maacs1.csv",method = "curl")
+maacs1 <- read.csv("./data/maacs1.csv")
+str(maacs1)
+maacs1$bmicat<- factor(maacs1$bmicat)
+str(maacs1)
+```
+
+#### 6.1 Basic Plot
+```{r}
+qplot(logpm25,NocturnalSympt,data = maacs1,geom = c("point","smooth"),method="lm",facets=.~bmicat)
+```
+
+#### 6.2. Building Up in Layers
+```{r}
+# Initial call to ggplot
+g <- ggplot(maacs1,aes(logpm25,NocturnalSympt))
+
+# summary of ggplot
+summary(g)
+```
+
+```{r eval=FALSE}
+
+print(g) # Errot: No layers in plot
+```
+
+#### First Plot with Point Layer
+```{r}
+p <- g + geom_point() # Explicitly save ggplot2 object
+print(p) # Now able to print
+
+```
+
+#### 6.3. Adding	More	Layers:	Smooth
+```{r}
+g + geom_point() + geom_smooth()
+```
+
+```{r}
+g + geom_point() + geom_smooth(method = "lm")
+```
+
+#### 6.4. Adding	More	Layers:	Facets
+
+```{r}
+g + geom_point() + geom_smooth(method = "lm") + facet_grid(.~bmicat)
+```
+
+### 7. Annotation
+
+- Labels:	`xlab()`,	`ylab()`,	`labs()`,	`ggtitle()`
+- Each	of	the	“geom”	functions	has	options	to	modify
+- For	things	that	only	make	sense	globally,	use	`theme()`
+    - Example: theme(legend.position	=	"none")
+- Two	standard	appearance	themes	are	included
+    - `theme_gray()`:	The	default	theme	(gray	background)
+    - `theme_bw()`:	More	stark/plain	
+
+### 8. Modifying Aesthetics
+
+#### 8.1 Constant Variable
+```{r}
+g + geom_point(color = "steelblue", size = 4, alpha = 1/2)
+```
+
+#### 8.2 Data Variable
+```{r}
+g + geom_point(aes(color = bmicat), size = 4, alpha = 1/2)
+```
+### 8. Modifying Labels
+```{r}
+g + geom_point(aes(color = bmicat)) + labs(title = "MAACS Cohort") + labs(x = expression("log "*PM[2.5]), y = "Nocturnal Symptoms")
+```
+
+### 9. Customizing	the	Smooth	
+```{r}
+g + geom_point(aes(color = bmicat), size = 2, alpha =1/2)+geom_smooth(size=4, linetype=3,method = "lm", se =FALSE)
+```
+
+### 10. Changing	the	Theme	
+```{r}
+g + geom_point(aes(color = bmicat)) + theme_bw(base_family = "calibri")
+```
