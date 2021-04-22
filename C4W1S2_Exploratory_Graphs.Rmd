@@ -1,7 +1,6 @@
 ---
 title: "C4W1S2"
 author: "Mr. Sachin B."
-date: "17/04/2021"
 output: html_document
 ---
 
