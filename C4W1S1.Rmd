@@ -1,0 +1,38 @@
+---
+title: "Exploratory Data Analysis (Swirl 1)"
+author: "Mr. Sachin B."
+
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Install swirl
+
+```{r}
+install.packages("swirl")
+```
+
+```{r}
+packageVersion("swirl")
+```
+
+### 2. Load swirl
+
+```{r}
+library(swirl)
+```
+
+### 3. Install the Exploratory Data Analysis course
+
+```{r}
+install_from_swirl("Exploratory Data Analysis")
+```
+
+### 4. Start swirl and complete the lessons
+
+```{r}
+swirl()
+```
