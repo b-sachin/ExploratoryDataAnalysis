@@ -265,6 +265,85 @@ g + geom_point(aes(color = bmicat), size = 2, alpha =1/2)+geom_smooth(size=4, li
 ```
 
 ### 10. Changing	the	Theme	
+```{r message=FALSE, warning=FALSE}
+library(extrafont)
+loadfonts(device = "win")
+```
+
 ```{r}
-g + geom_point(aes(color = bmicat)) + theme_bw(base_family = "calibri")
+g + geom_point(aes(color = bmicat)) + theme_bw(base_family = "Times New Roman")
+```
+
+#### if getting error "font family not found in Windows font database"
+```{r,eval=FALSE}
+install.packages("extrafont")
+library(extrafont)
+font_import()
+loadfonts(device = "win")
+```
+
+### 11. About Access Limit 	
+
+#### 11.1 Graph with outlier in base system
+```{r}
+testdat <- data.frame(x = 1:100, y = rnorm(100))
+testdat[50,2] <- 100 ## Outlier!
+
+plot(testdat$x, testdat$y, type = "l", ylim = c(-3,3))
+```
+
+#### 11.2 Graph with outlier in ggplot system (Default)
+```{r}
+g <- ggplot(testdat, aes(x=x,y=y))
+g+geom_line()
+```
+
+#### 11.3 Graph with outlier in ggplot system (setting ylim (-3,3))
+```{r}
+g + geom_line() + ylim(-3,3)
+```
+
+#### 11.4 Graph with outlier in ggplot system (Optimized way)
+```{r}
+g + geom_line() + coord_cartesian(ylim=c(-3,3))
+```
+
+
+### 12. How does the relationship between PM<sub>2.5</sub> and nocturnal	symptoms	vary	by	BMI	and	NO<sub>2</sub>?
+
+- Unlike	our	previous	BMI	variable,	NO<sub>2</sub>	is continuous	
+- We	need	to	make	NO<sub>2</sub>	categorical	so	we	can	condition on	it	in	the	plotting
+    - Use	the	`cut()`	function	for	this
+
+#### 12.1 Making	NO<sub>2</sub>	Deciles
+
+1.  Calculate the deciles of the data
+```{r}
+cutpoints <- quantile(maacs1$logno2_new,seq(0,1,length = 4),na.rm = TRUE)
+
+print(cutpoints)
+```
+
+2. Cut the data at the deciles and create a new factor variable
+```{r}
+maacs1$no2dec <- cut(maacs1$logno2_new,cutpoints)
+
+print(head(maacs1$no2dec))
+```
+
+3.  See the levels of the newly created factor variable
+```{r}
+levels(maacs1$no2dec)
+```
+
+#### 12.2 Final	Plot
+
+```{r message=FALSE, warning=FALSE}
+library(extrafont)
+loadfonts(device = "win")
+
+
+g = ggplot(maacs1,aes(logno2_new,NocturnalSympt))
+
+g + geom_point(alpha = 1/3)+ facet_wrap(bmicat ~ no2dec, nrow = 2, ncol =4)+ geom_smooth(method = "lm", se = FALSE, col= "steelblue")+ theme_bw(base_family = "Avenir", base_size = 10)+ labs(x = expression("log"*PM[2.5]), y = "Nocturnal Symptoms", title = "MAACS Cohort")
 ```
