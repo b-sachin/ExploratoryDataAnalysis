@@ -1,0 +1,321 @@
+---
+title: "Working with Colors (Swirl)"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Color in R
+
+- Color choice is sometimes secondary to our data and how we analyze it, but effectively using colors can enhance your plots and presentations, emphasizing the important points we're trying to convey.
+- The motivation for this lesson is that the default color schemes for most plots in R are not optimal.
+- There have been recent developments to improve the handling and specification of colors in plots and graphs.
+- So these are the first 3 default values. If you were plotting and just specified col=c(1:3) as one of your arguments, these are colors you'd get. Maybe you like them, but they might not be the best choice for your application.
+
+```{r}
+library(lattice)
+x=rnorm(30)
+y=rnorm(30)
+xyplot(y~x,col=c(1:3))
+```
+
+### 2. Colors function in grDevices
+
+- The function `colors()` lists the names of **657** predefined colors you can use in any plotting function.
+- These names are returned as strings.
+```{r}
+sample(colors(),10)
+
+#a lot of variety in the colors, some of which are names followed by numbers indicating that there are multiple forms of that particular color.
+```
+
+### 3. colorRamp and colorRampPalette
+
+- It gives us more options.
+- Both of these take color names as arguments and use them as "palettes", that is, these argument colors are blended in different proportions to form new colors.
+
+### 4. colorRamp
+
+- It takes a palette of colors (the arguments) and returns a function that takes values between 0 and 1 as arguments. - The 0 and 1 correspond to the extremes of the color palette.
+- Arguments between 0 and 1 return blends of these extremes.
+
+```{r}
+pal <- colorRamp(c("red","blue"))
+
+# R has created the function pal which we can call with a single argument between 0 and 1.
+
+pal(0)
+
+```
+
+This 3 long vector corresponds to red, green, blue (RGB) color encoding commonly used in televisions and monitors. 
+
+- In R, 24 bits are used to represent colors.
+- Think of these 24 bits as 3 sets of 8 bits, each of which represents an intensity for one of the colors red, green, and blue.
+
+```{r}
+
+pal(1)
+
+pal(0.5)
+
+pal(0.33)
+
+pal(0.66)
+```
+
+#### 4.1. Function created by 'colorRamp' can take more than one argument.
+
+Instead of getting one color at a time just like above; you can get range of colors between two specified extreme values.
+
+- `pal` creates colors using the palette we specified when we called **colorRamp**.
+
+- Creating **`pal`** function with extreme values:
+    - **red as 0**
+    - **blue as 1**
+```{r}
+pal <- colorRamp(c("red","blue"))
+```
+
+
+
+- In example below, none of pal's outputs will ever contain green since it wasn't in our initial palette.
+```{r}
+# Example 1
+pal(seq(0,1,len=6))
+
+# Example 2
+pal(seq(0.4,0.6,len=10))
+
+```
+
+
+### 5. colorRampPalette
+
+- **colorRampPalette** function is similar to **colorRamp**.
+- It also takes a *'palette of colors'* as input and returns a *'function'* as output (eg: pal).
+- This function, takes *'integer arguments'* (instead of numbers between 0 and 1) and returns a *'vector of colors'* each of which is a blend of colors of the original palette.
+  - The argument you pass to the '*returned function*' specifies the number of colors you want returned.
+  - Each element of the returned vector is a **24 bit** number, represented as **6 hexadecimal characters**, which range from **0 to F**.
+  - This set of 6 hex characters represents the **intensities of red, green, and blue**, 2 characters for each color.
+
+##### Example 1:
+```{r}
+pal2 <- colorRampPalette(c("red","blue"))
+
+# R has created the function pal2 which we can call with a single argument between 0 and 255.
+
+pal2(2)
+
+```
+
+##### Explanation 1:
+- 2-long vector is returned.
+  - The first entry FF0000 represents red.
+    - The FF is hexadecimal for 255,
+    - the same value returned by our call pal(0).
+  - The second entry 0000FF represents blue, also with intensity 255.
+
+##### Example 2:
+
+- It will produce the same result as we did when we called pal with the argument `seq(0,1,len=6)` but in hexademimal format.
+
+```{r}
+
+pal2(6) 
+
+```
+
+#### 5.1. Forming a palettes using colors other than red, green and blue
+
+- ***pal3**, by calling **colorRampPalette** with the colors "**red**" and "**yellow**".
+
+##### Example 3:
+```{r}
+
+pal3 <- colorRampPalette(c("red","yellow"))
+
+# To see Extreme blends of the color
+pal3(2)
+```
+
+##### Explanation 3:
+
+1. first color is **FF0000**,
+    - which represents **red**.
+2. second color is **FFFF00**,
+    - which represent yellow, a combination of full intensity red and full intensity green.
+
+##### Example 4:
+```{r}
+# To see shades between "red" and "yellow"
+pal3(10)
+```
+
+### 6. Interpolated Palette
+ - **Low values** in the **lower left corner** and 
+ - **High values** in the **top right corner**
+
+```{r}
+# 'pal3', by calling 'colorRampPalette' with the colors "red" and "yellow".
+pal3 <- colorRampPalette(c("red","yellow"))
+
+# To see shades between "red" and "yellow"
+pal3(10)
+
+
+# ShowME is user defined function created with copied some code from the R documentation pages (color.scale) 
+
+source("showME.R")
+
+# showME will show the interpolated palette here.
+  ## Low values in the lower left corner are red and 
+  ## as you move to the upper right, the colors move toward yellow.
+showME(pal3(10))
+
+```
+
+```{r}
+showME(pal3(50))
+```
+
+```{r}
+showME(pal3(255))
+```
+
+```{r}
+showME(pal3(2))
+```
+
+### 7. rgb
+```{r}
+pal3
+```
+
+##### Explination:
+
+- **pal3** is a short function with one argument, **n**.
+- The argument **n** is used as the length in a call to the function seq.int, itself an argument to the function ramp. 
+- **ramp** is just going to divide the interval from **0 to 1** into **n pieces**.
+- The heart of **pal3** is really the call to the function **rgb** with either 4 or 5 arguments.
+
+```{r eval= FALSE}
+?rgb # For documentation for ‘rgb’
+```
+
+- **rgb** is a color specification function that can be used to produce any color with **red, green, blue** proportions.
+- the **maxColorValue is 1** by default, so if we called rgb with values for red, green and blue, we would specify numbers at most 1 (assuming we didn't change the default for maxColorValue).
+- According to the documentation, maximum 6 arguments that rgb can have
+- **fourth argument is** ***alpha*** which can be a logical, i.e., either **TRUE or FALSE**, or a **numerical value**. 
+
+#### 7.1 Alpha
+
+- Alpha represents an opacity level, that is, how transparent should the colors be.
+- We can add color transparency with the alpha parameter to calls to rgb.
+
+##### Example: 7.1.1
+```{r}
+# Color Palette 'pal4' is generated with "alpha" i.e. opacity level equal to 0.5
+pal4 <- colorRampPalette(c("blue","green"),alpha = 0.5)
+
+pal4(5)
+```
+
+##### Explanation: 7.1.1
+- The last 8 bits represent the value of alpha.
+- When it was 0 or FALSE (as in previous calls to colorRampPalette) it was given the value 00 and wasn't shown. 
+- The leftmost 24 bits of each element are the same RGB encoding.
+
+##### Example: 7.1.2
+
+1. 1000 random normal pairs
+    - for you in the variables x and y. 
+2. plot them in a scatterplot by calling plot with 4 arguments.
+    - The variables x and y are the first
+3. The third is the print character argument pch.
+    - Set this equal to 19 (filled circles). 
+4. The final argument is col 
+    - which should be set equal to a call to rgb.
+    - Give rgb 3 arguments, 0, 0.5, and 0.5.
+
+##### Without Alpha:
+```{r}
+x <- rnorm(1000)
+y <- rnorm(1000)
+
+
+plot(x,y, pch=19,col=rgb(0,0.5,0.5))
+```
+
+##### With Alpha:
+```{r}
+plot(x,y, pch=19,col=rgb(0,0.5,0.5,0.3))
+```
+
+### 8. RColorBrewer Package
+
+- **RColorBrewer Package**, available on CRAN, that contains interesting and useful color palettes,
+- It has 3 types:
+    1. sequential
+    2. divergent
+    3. qualitative
+- Which one you would choose to use depends on your data.
+
+##### Example: 8.1.1
+```{r fig.height=9}
+library(RColorBrewer)
+display.brewer.all()
+```
+
+##### Explanation: 8.1.1
+
+1. The **top section shows** ***the sequential palettes***
+    - in which the **colors are ordered from light to dark**.
+2. The ***divergent palettes*** are **at the bottom**.
+    - Here the **neutral color (white) is in the center**, and 
+    - as you move from the **middle to the two ends of each palette, the colors increase in intensity**.
+3. The **middle display** shows the ***qualitative palettes***
+    - which look like **collections of random colors**.
+    - These might be used to distinguish factors in your data.
+    
+##### Example: 8.1.2
+
+- create a new object, **cols** by calling the function **brewer.pal** with 2 arguments,
+    - **3** (The 3 tells the function **how many different colors we want**.)
+    - "**BuGn**" (The string "BuGn" is the **second last palette in the sequential display**. 
+```{r}
+# Creating "BuGn" color palette with 3 colors
+cols<-brewer.pal(3,"BuGn")
+
+# showME to look at cols now.
+showME(cols)
+```
+
+- Now create the variable **pal** by calling **colorRampPalette** with **cols** as its argument.
+```{r}
+pal5 <- colorRampPalette(cols)
+
+# showME to look at pal(20)
+showME(pal5(20))
+```
+
+##### Example: 8.1.3
+- use the colors in pal(20) to display **topographic information on Auckland's Maunga Whau Volcano**.
+- R provides this information in a matrix called **volcano** which is included in the package **datasets**.
+```{r}
+image(volcano,col=pal5(20))
+```
+
+```{r}
+image(volcano,col=pal4(20))
+```
+
+### 9. Practice
+```{r}
+pal6 <- colorRampPalette(c("sienna2","gray100","seagreen3"))
+
+showME(pal6(150))
+```
