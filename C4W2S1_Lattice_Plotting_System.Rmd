@@ -1,0 +1,208 @@
+---
+title: "Lattice Plotting System"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Lattice Plotting System
+
+- The lattice plotting system is completely separate and independent of the base plotting system.
+- It has to be explicitly loaded with a call to the R function library.
+- Lattice "is an implementation of Trellis graphics for R.
+- It is a powerful and elegant high-level data visualization system with an emphasis on multivariate data.
+
+#### 1.1. Lattice is implemented using two packages.
+
+1. The first is called `lattice`
+    - It contains code for producing Trellis graphics.
+    - Some of the functions in this package are the higher level functions which the user would call.
+    - These include `xyplot`, `bwplot`, and `levelplot`.
+2. The second package in the lattice system is `grid`
+    - which contains the low-level functions upon which the lattice package is built.
+    - The user seldom call functions from the grid package directly.
+
+
+#### 1.2. Compare and Contrast to Base Plotting System
+
+- Unlike base plotting, the lattice system does not have a "two-phase" aspect with separate plotting and annotation.
+  - Instead all plotting and annotation is done at once with a single function call.
+
+- The lattice system, as the base does, provides several different plotting functions.
+  - These include 
+    - `xyplot` for creating scatterplots,
+    - `bwplot` for box-and-whiskers plots or boxplots, and 
+    - `histogram` for histograms.
+  - There are several others such as `stripplot`, `dotplot`, `splom` and `levelplot`
+
+### 2. Lattice functions
+- Lattice functions generally take a formula for their first argument, usually of the form **y ~ x**.
+    - This indicates that y depends on x, so in a scatterplot y would be plotted on the y-axis and x on the x-axis.
+  
+- Example: **xyplot(y ~ x | f * g, data)**
+  1. The first argument is the condition
+      - The f and g represent the optional conditioning variables.
+      - The * represents interaction between them.
+  2. The second argument is the data frame or list from which the variables in the formula should be looked up.
+      - If no data frame or list is passed, then the parent frame is used.
+      - If no other arguments are passed, the default values are used.
+
+#### 2.1. xyplot() without annotation
+```{r}
+#Load Lattice Plot
+library(lattice)
+
+# To see data
+airquality<-read.csv("./data/airquality.csv")
+head(airquality)
+
+# xyplot
+xyplot(Ozone~Wind,airquality)
+```
+
+#### 2.2. xyplot() with annotation
+```{r}
+# xyplot
+xyplot(Ozone ~ Wind, data = airquality, pch=8, col="red",main="Big Apple Data")
+```
+
+### 3. Multipanel Plot
+
+```{r}
+# xyplot
+xyplot(Ozone ~ Wind | as.factor(Month), data = airquality,layout=c(5,1)) 
+```
+
+- **as.factor(Month)** Displayed and labeled each subplot with the month's integer
+
+### 4. Trellis Plot Object
+
+```{r}
+# returns a trellis plot object which stored in p
+# plot will not be printed
+p <- xyplot(Ozone~Wind,airquality)
+```
+
+```{r}
+# print 'p' to print plot
+print(p)
+```
+
+#### The trellis object p has 45 named properties
+```{r}
+names(p)
+```
+
+#### Out of 45 Which properties has values 
+```{r}
+# creating vector of all properties names
+mynames<-names(p)
+
+# creating boolean vector, myfull, which has TRUE values for non-null entries of p.
+
+is.not.null <- function(x) !is.null(x)
+myful= sapply(p, is.not.null)
+for(i in mynames)
+{
+  myfull <- paste0(myful)
+}
+myfull=as.logical(myfull)
+
+# printing properties which has non- null values
+mynames[myfull]
+
+
+# print the values for some non-null properties
+## 1.
+p[["formula"]]
+
+## 2. 
+p[["x.limits"]]
+```
+
+### 5. panel functions 
+The lattice package comes with default panel functions, but you can customize what happens in each panel.
+
+#### Creating data
+```{r}
+# creating data for x,y and z
+# x has 100 random values
+x<- rnorm(100)
+
+#  first 50 values of y is a function of x and last 50 values are random. 
+y<- rnorm(50)+ x[1:50]
+y[51:100] <- rnorm(50)
+
+# 100-long factor vector f which distinguishes between the first and last 50 elements of the two vectors. 
+
+f<- gl(2,50,labels = c("Group 1","Group 2"))
+
+table((f))
+```
+
+#### xyplot()
+```{r}
+xyplot(y~x|f,layout=c(2,1))
+
+```
+
+#### Ranges of x and y values
+```{r}
+
+a<-xyplot(y~x|levels(f)[1])
+a
+
+V1 <- c(range(x[f==levels(f)[1]]),range(y[f==levels(f)[1]]))
+
+names(V1)<- c("x_min_Group_1","x_max_Group_1","y_min_Group_1","y_max_Group_1")
+V1
+
+b<-xyplot(y~x|levels(f)[2])
+b
+
+V2 <- c(range(x[f==levels(f)[2]]),range(y[f==levels(f)[2]]))
+
+names(V2)<- c("x_min_Group_2","x_max_Group_2","y_min_Group_2","y_max_Group_2")
+V2
+
+```
+
+### 6. lattice's panel plotting capability
+
+#### Getting 'diamonds' dataset
+```{r}
+# 'diamonds' dataset is built-in available in ggplot2 package
+library(ggplot2)
+head(diamonds)
+
+#structure of diamonds dataset
+str(diamonds)
+
+# 20 sample values of color column
+sample(diamonds$color,20)
+
+# No. of values for each color of diamonds 
+table(diamonds$color)
+
+# diamonds color Vs diamonds cut
+table(diamonds$color,diamonds$cut)
+```
+
+#### xyplot for price and carat according to color and cut in panels  
+```{r}
+xyplot(price~carat | color*cut,data = diamonds,strip = FALSE, pch = 20, xlab = "Carat", ylab ="Price",main= "Price Vs Carat")
+
+```
+
+Q: color*cut which column appear on x-axis?
+A: There are 5 rows and 7 columns similar to 5 cuts and 7 colors therefor 'color' column is on x-axis.
+
+Q: What does `strip=FALSE` do?
+A: strip argument shows labels information of each panel
+```{r}
+xyplot(price~carat | color*cut,data = diamonds,strip = TRUE, pch = 20, xlab = "Carat", ylab ="Price",main= "Price Vs Carat")
+
+```
