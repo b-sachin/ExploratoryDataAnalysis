@@ -1,0 +1,549 @@
+---
+title: "ggplot2 (Swirl)"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Introduction
+
+- The **ggplot2 package** is an add-on package available from CRAN via install.packages().
+- It is an implementation of The Grammar of Graphics, an abstract concept authored and invented by Leland Wilkinson and implemented by Hadley Wickham.
+- A grammar of graphics represents an abstraction of graphics, that is, a theory of graphics which conceptualizes basic pieces from which you can build new graphics and graphical objects.
+- The goal of the grammar is to “Shorten the distance from mind to page”.
+- The ggplot2 package "is composed of a set of independent components that can be composed in many different ways. 
+- These components include:
+  - **aesthetics** which are attributes such as **colour, shape, and size**, and
+  - **geometric objects or geoms** such as **points, lines, and bars**.
+- It allows for 
+  - **multipanel (conditioning) plots (as lattice does)** but also 
+  - **post facto annotation (as base does)**, so you can add titles and labels.
+- It uses the low-level grid package (which comes with R) to draw the graphics.
+
+##### The ggplot2 package has 2 workhorse functions.
+1. The more **basic workhorse function** is **qplot**, (think quick plot),
+    - which works like the plot function in the base graphics system.
+    - **It can produce** many types of plots (**scatter, histograms, box and whisker**) while hiding tedious details from the user.
+    - Similar to lattice functions, it looks for data in a data frame or parent environment.
+2. The **more advanced workhorse function** in the package is **ggplot**,
+    - which is more flexible and **can be customized for doing things qplot cannot do.**
+  
+## 2. qplot()
+
+```{r}
+
+mpg = read.csv("mpg.csv")
+# dataset: mpg
+str(mpg)
+```
+
+### 2.1. Scatterplot
+
+##### Example 2.1.1:
+To see if there's a correlation between engine displacement (displ) and highway miles per gallon (hwy).
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+
+qplot(displ,hwy,data = mpg)
+```
+
+##### Explanation 2.1.1:
+
+- qplot with 3 arguments,
+    - the first two are the variables we want to examine and 
+    - the third argument data is set equal to the name of the dataset which contains them (in this case, mpg).
+    
+##### Example 2.1.2:
+suppose we want to do the same plot but this time use different colors to distinguish between the 3 factors (subsets) of different types of drive (drv) in the data (front-wheel, rear-wheel, and 4-wheel).
+```{r}
+qplot(displ,hwy,data = mpg,color=drv)
+```
+
+##### Explanation 2.1.2:
+
+- We have just add what ggplot2 calls an **aesthetic**,
+    - a fourth argument, **color**, and set it equal to **drv**.
+- See the legend to the right which qplot helpfully supplied
+- The colors were automatically assigned by qplot so the legend decodes the colors for you. 
+- Notice that qplot automatically used dots or points to indicate the data.
+- These points are geoms (geometric objects).
+
+##### Example 2.1.3:
+
+- Just add a fifth argument, geom, and using the R function c(),
+- set it equal to the concatenation of the two strings "point" and "smooth". The         - first refers to the data points and
+    - second to the trend lines we want plotted.
+```{r}
+qplot(displ,hwy,data = mpg,color=drv,geom = c("point","smooth"))
+```
+
+##### Explanation 2.1.3:
+
+- The gray areas surrounding each trend lines.
+- These indicate the 95% confidence intervals for the lines.
+
+##### Example 2.1.4:
+
+Plot a Scatterplot which has property values in the form of intervals on x-axis axis and individual value of property on y axis.
+
+```{r}
+qplot(y= hwy,data = mpg,color=drv)
+```
+
+##### Explanation 2.1.4:
+
+- We see the x-axis ranges from 0 to 250 and we remember that we had 234 data points in our set,
+- so we can infer that each point in the plot represents one of the hwy values (indicated by the y-axis).
+
+##### Verify 2.1.4:
+```{r}
+print(mpg$hwy)
+```
+
+- Comparing the values of mpg$hwy with the plot,
+- we see the first entries in the vector (29, 29, 31, 30,...) correspond to the leftmost points in the the plot (in order), and 
+- the last entries in myhigh (28,29, 26, 26, 26) correspond to the rightmost plotted points. 
+- So, specifying the y parameter only, without an x argument, plots the values of the y argument in the order in which they occur in the data.
+
+
+### 2.2. Boxplot
+The all-purpose qplot can also create box and whisker plots.  
+
+##### Example 2.2.1:
+
+- Call qplot now with 4 arguments.
+  - First specify the **variable by which you'll split the data**,
+    - in this case **drv**,
+  - then specify the **variable which you want to examine**,
+    - in this case **hwy**.
+  - The third argument is **data**
+    - **data =  mpg**,
+  - and the fourth, the **geom**,
+    - set equal to the string "**boxplot**" (**geom = "boxplot**)
+
+```{r}
+qplot(drv,hwy, data = mpg, geom = "boxplot")
+```
+
+##### Explanation 2.2.1:
+
+- We see 3 boxes, one for each drive.
+
+##### Variation 2.2.1.1:
+```{r}
+qplot(drv,hwy, data = mpg, geom = "boxplot",color = manufacturer)
+```
+
+##### Explanation 2.2.1.1:
+
+- qplot's capabilities.
+    - Notice that there are still 3 regions of the plot (determined by the factor drv).
+    - Each is subdivided into several boxes depicting different manufacturers.
+    
+### 2.3. Histogram
+
+- Histogram displays frequency counts for a single variable.
+
+##### Example 2.3.1:
+
+- Call **qplot** with 3 arguments.
+    - First specify the **variable for which you want the frequency count**,
+      - in this case **hwy**,
+    - then **specify the data**
+      -  **data = mpg**, and 
+    - finally, **the aesthetic**, 
+      - **fill = drv**.
+    
+- Instead of a plain old histogram, this will again use colors to distinguish the 3 different drive factors. 
+
+```{r}
+qplot(hwy,data=mpg,fill=drv)
+```
+
+##### Explanation 2.3.1:
+
+- qplot consistently uses the colors.
+  - Red (if 4-wheel drv is in the bin) is at the bottom of the bin,
+  - then green on top of it (if present),
+  - followed by blue (rear wheel drv). - The color lets us see right away that 4-wheel drive vehicles in this dataset don't have gas mileages exceeding 30 miles per gallon.
+  
+### 2.4 Facets
+
+Instead of using colors to distinguish between the drive factors let's use facets or panels (That's what lattice called them). 
+
+- This just means we'll split the data into 3 subsets (according to drive) and make 3 smaller individual plots of each subset in one plot (and with one call to qplot).
+
+##### Example 2.4.1:
+
+- call qplot with 4 arguments.
+  - The first two are displ and hwy and 
+  - the third is the argument data set equal to mpg.
+  - The fourth is the argument facets which will be set equal to the expression **.~drv** 
+    - which is ggplot2's shorthand for number of rows (to the left of the ~) and number of columns (to the right of the ~). 
+    - Here the . indicates a single row and drv implies 3, since there are 3 distinct drive factors.
+
+```{r}
+qplot(displ,hwy,data=mpg, facets = .~drv)
+```
+
+##### Explanation 2.4.1:
+
+- The result is a 1 by 3 array of plots.
+- Note how each is labeled at the top with the factor label (4,f, or r).
+- This shows us more detailed information than the histogram.
+- We see the relationship between displacement and highway mileage for each of the 3 drive factors.
+
+##### Example 2.4.2:
+
+- call **qplot** with 4 arguments.
+  - This time, since we need **only one variable for a histogram**, 
+    - the **first is hwy** and 
+  - the **second is the argument data**
+    - **data = mpg**.
+  - The **third is the argument facets**
+    - which we'll set equal to the expression **drv ~ .**
+    - This will give us a different arrangement of the facets.
+  - The **fourth argument is binwidth**.
+    - **binwidth = 2**
+
+```{r}
+qplot(hwy,data=mpg, facets = drv~.,binwidth=2)
+```
+
+##### Explanation 2.4.1:
+
+- The facets argument, **( drv ~ . )**,
+  - resulted in a **3 by 1** arrangement of facets
+  
+## 3. ggplot
+
+A "grammar" of graphics means that ggplot2 contains building blocks with which you can create your own graphical objects. <br>
+
+There are **7 basic components of ggplot2 plots**:
+
+1. **DATA FRAME**
+    - which contains **the data you're trying to plot**.
+2. **AESTHETIC MAPPINGS**
+    - determine **how data are mapped to color, size, etc**.
+3. **GEOMS** (geometric objects)
+    - these are **what you see in the plot (points, lines, shapes)**
+4. **FACETS**
+    - which are **the panels used in conditional plots**.
+5. **STATS**
+    - these are **statistical transformations such as binning, quantiles, and smoothing** which ggplot2 applies to the data.
+6. **SCALES**
+    - It shows **what coding an aesthetic map uses**
+    - (for example, male = red, female = blue).
+7. **COORDINATE SYSTEM**
+    - the **plots are depicted on a COORDINATE SYSTEM**.
+    - When you use qplot these were taken care of for you.
+    
+### 3.1 Creating 'g' (graphical object)
+
+##### Example 3.1.1:
+
+- First create a variable **g** by assigning to it the output of a **call to ggplot with 2 arguments**.
+  - The **first is mpg**
+    - (our **dataset**) and 
+  - the **second will tell ggplot what we want to plot**,
+    - in this case, **displ and hwy**.
+    - These are what we want our aesthetics to represent so we **enclose these as two arguments to the function aes**.
+
+```{r}
+g <- ggplot(mpg,aes(displ,hwy))
+```
+
+##### Explanation 3.1.1:
+
+- Notice that nothing happened
+- As in the lattice system, ggplot created a graphical object which we assigned to the variable g.
+
+#### Summary of 'g'
+```{r}
+summary(g)
+```
+
+##### Explanation:
+- g contains the mpg data with all its named components in a 234 by 11 matrix.
+- It also contains a mapping, x (displ) and y (hwy) which you specified, and no faceting.
+
+#### printing problem of 'g'
+```{r eval= FALSE}
+print(g)
+```
+
+**Note that if you tried to print g with the expressions g or print(g) you'd get an error!**
+
+- Even though it's a great package, ggplot doesn't know how to display the data yet since you didn't specify how you wanted to see it.
+
+### 3.2 g + function() + ...
+
+#### 3.2.1 geom_point() 
+```{r}
+# Prining of 'g'
+
+g+geom_point()
+
+```
+
+##### Explanation:
+- By calling the function geom_point you added a layer.
+- By not assigning the expression to a variable you displayed a plot.
+- Notice that you didn't have to pass any arguments to the function geom_point.
+    - That's because the object g has all the data stored in it.
+
+#### 3.2.2 geom_smooth() 
+```{r}
+# Prining of 'g'
+
+g+geom_point()
+
+```
+
+##### Explanation:
+- By calling the function geom_point you added a layer.
+- By not assigning the expression to a variable you displayed a plot.
+- Notice that you didn't have to pass any arguments to the function geom_point.
+    - That's because the object g has all the data stored in it.
+    
+## 3. ggplot
+
+A "grammar" of graphics means that ggplot2 contains building blocks with which you can create your own graphical objects. <br>
+
+There are **7 basic components of ggplot2 plots**:
+
+1. **DATA FRAME**
+    - which contains **the data you're trying to plot**.
+2. **AESTHETIC MAPPINGS**
+    - determine **how data are mapped to color, size, etc**.
+3. **GEOMS** (geometric objects)
+    - these are **what you see in the plot (points, lines, shapes)**
+4. **FACETS**
+    - which are **the panels used in conditional plots**.
+5. **STATS**
+    - these are **statistical transformations such as binning, quantiles, and smoothing** which ggplot2 applies to the data.
+6. **SCALES**
+    - It shows **what coding an aesthetic map uses**
+    - (for example, male = red, female = blue).
+7. **COORDINATE SYSTEM**
+    - the **plots are depicted on a COORDINATE SYSTEM**.
+    - When you use qplot these were taken care of for you.
+    
+```{r}
+library(ggplot2)
+```
+
+### 3.1 Creating 'g' (graphical object)
+
+- First create a variable **g** by assigning to it the output of a **call to ggplot with 2 arguments**.
+  - The **first is mpg**
+    - (our **dataset**) and 
+  - the **second will tell ggplot what we want to plot**,
+    - in this case, **displ and hwy**.
+    - These are what we want our aesthetics to represent so we **enclose these as two arguments to the function aes**.
+
+```{r}
+g <- ggplot(mpg,aes(displ,hwy))
+```
+
+##### Explanation 3.1.1:
+
+- Notice that nothing happened
+- As in the lattice system, ggplot created a graphical object which we assigned to the variable g.
+
+#### Summary of 'g'
+```{r}
+summary(g)
+```
+
+##### Explanation:
+- g contains the mpg data with all its named components in a 234 by 11 matrix.
+- It also contains a mapping, x (displ) and y (hwy) which you specified, and no faceting.
+
+#### printing problem of 'g'
+```{r eval= FALSE}
+print(g)
+```
+
+**Note that if you tried to print g with the expressions g or print(g) you'd get an error!**
+
+- Even though it's a great package, ggplot doesn't know how to display the data yet since you didn't specify how you wanted to see it.
+
+### 3.2 g + function() + ...
+
+#### 3.2.1 geom_point() 
+```{r}
+# Prining of 'g'
+
+g+geom_point()
+
+```
+
+##### Explanation:
+- By calling the function geom_point you added a layer.
+- By not assigning the expression to a variable you displayed a plot.
+- Notice that you didn't have to pass any arguments to the function geom_point.
+    - That's because the object g has all the data stored in it.
+
+#### 3.2.2 geom_smooth() 
+```{r}
+
+g+geom_point()+geom_smooth()
+
+```
+
+##### Explanation:
+-  The gray shadow around the blue line is the confidence band.
+
+##### Variation: 
+
+```{r}
+
+g+geom_point()+geom_smooth(method="lm")
+
+```
+
+##### Explanation:
+-  By changing the smoothing function to "lm" (linear model) ggplot2 generated a regression line through the data. 
+
+#### 3.2.3 facet_grid() 
+
+Note that this is the same type of formula used in the calls to qplot.
+
+```{r}
+g+geom_point()+geom_smooth(method="lm")+facet_grid(.~drv)
+```
+
+##### Explanation:
+-  Notice how each panel is labeled with the appropriate factor.
+  - All the data associated with 4-wheel drive cars is in the leftmost panel, 
+  - front-wheel drive data is shown in the middle panel, and
+  - rear-wheel drive data in the rightmost.
+
+#### 3.2.4 xlab(), ylab(), and ggtitle()
+
+- So far you've just used the default labels that ggplot provides.
+- You can add your own annotation using functions such as xlab(), ylab(), and ggtitle().
+- In addition, the function labs() is more general and can be used to label either or both axes as well as provide a title.
+```{r}
+g+geom_point()+geom_smooth(method="lm")+facet_grid(.~drv)+ggtitle("My Title")
+```
+
+### 3.3 Argument Customizing
+
+#### 3.3.1 Customizing aesthetics (When arguments are Constant)
+```{r}
+g+geom_point(color = "pink", size = 4, alpha = 0.5)
+```
+
+##### Explanation:
+**Notice that all the arguments are set equal to constants.** <br>
+
+- Notice the different shades of pink? That's the result of the alpha aesthetic which you set to 0.5
+- This aesthetic tells ggplot how transparent the points should be.
+- Darker circles indicate values hit by multiple data points.
+
+#### 3.3.2 Customizing aesthetics (When argument is data dependent)
+```{r}
+g+geom_point(size = 4, alpha = 0.5,aes(color = drv))
+```
+
+##### Explanation:
+**Note that you MUST use** the function **aes** since **the color of the points is data dependent** and not a constant as it was in the previous example.<br>
+
+- Notice the helpful legend on the right decoding the relationship between color and drv.
+
+
+#### 3.3.3  Customizing labels
+```{r}
+g+geom_point(aes(color = drv))+labs(title = "My Title")+labs(x="Displacement",y="Hwy Mileage")
+```
+
+##### Explanation:
+
+- Note that you could have combined the two calls to the function labs in the previous example.
+
+#### 3.3.4 customizing geom_smooth()
+
+```{r}
+g+geom_point(aes(color = drv),size = 2, alpha = 0.5)+geom_smooth(size = 4, linetype = 3, method = "lm", se = FALSE)
+```
+
+##### Explanation:
+
+- The **method specified a linear regression** (note the negative slope indicating that the bigger the displacement the lower the gas mileage), - the **linetype specified that it should be dashed** (not continuous), - the **size made the dashes big**, and 
+- the **se flag told ggplot to turn off the gray shadows indicating standard errors** (confidence intervals).
+
+### 3.4 plot using the black and white theme, theme_bw
+
+```{r}
+g+geom_point(aes(color = drv))+theme_bw(base_family = "Times")
+```
+
+##### Explanation:
+
+- No more gray background! 
+- the font in the labels changed.
+
+### 3.5 impulse handling
+
+##### What is impulse
+```{r}
+testdat <- data.frame(myx = 1:100, myy = rnorm(100))
+testdat[50,2] <- 100 ## Outlier!
+
+g <- ggplot(testdat, aes(x = myx, y = myy))
+g+geom_line()
+```
+
+##### How it handled by base plot
+```{r}
+plot(testdat$myx, testdat$myy, type = "l", ylim = c(-3,3))
+```
+
+##### if we code just like base plot
+```{r}
+g+geom_line()+ylim(-3,3)
+```
+
+##### coordinate system will give expected result 
+```{r}
+g+geom_line()+coord_cartesian(ylim=c(-3,3))
+```
+
+##### EXplanation:
+
+- This looks more like the plot produced by the base plot function.
+- The outlier y value at x=50 is not shown, but the plot indicates that it is larger than 3.
+
+### 3.6 Complicated example presentation using ggplot
+
+##### Plot for displ Vs hwy along with distinguish between the two manufacturing years (1999 and 2008)
+```{r}
+g <- ggplot(mpg, aes(x = displ,y = hwy, color = factor(year)))
+```
+
+##### Show Plot
+```{r}
+g+geom_point()
+```
+
+##### Let's make our display a 2 dimensional multi-panel plot.
+```{r}
+g+geom_point()+facet_grid(drv~cyl,margins = TRUE)
+```
+
+##### EXplanation:
+
+- A 4 by 5 plot,
+- The **margins argument** tells ggplot to **display the marginal totals over each row and column**, 
+  - so instead of seeing 3 rows (the number of drv factors) and 4 columns (the number of cyl factors) we see a 4 by 5 display. 
+- Note that the **panel in position (4,5) is a tiny version of the scatterplot of the entire dataset**.
+
+##### Adding Regression line to all plots along with common labels
+```{r}
+g+geom_point()+facet_grid(drv~cyl,margins = TRUE)+geom_smooth(method = "lm", se = FALSE, size = 2, color = "black")+ labs(x = "Displacement", y = "Highway Mileage",title = "My Title")
+```
