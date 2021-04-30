@@ -259,9 +259,9 @@ plot(x,y, pch=19,col=rgb(0,0.5,0.5,0.3))
 
 - **RColorBrewer Package**, available on CRAN, that contains interesting and useful color palettes,
 - It has 3 types:
-    1. sequential
-    2. divergent
-    3. qualitative
+    1. sequential : suitable for ordered data like low to high
+    2. divergent : suitable for data has -ve, 0 (center point), +ve values (mean and deviation on +ve and -ve side)
+    3. qualitative : unordered data like factor or categorical data
 - Which one you would choose to use depends on your data.
 
 ##### Example: 8.1.1
@@ -313,7 +313,45 @@ image(volcano,col=pal5(20))
 image(volcano,col=pal4(20))
 ```
 
-### 9. Practice
+#### 8.2. smoothScatter function
+
+- This function is particularly useful if we have to make a scatter plot of a lot of different points but we you don't want to just have a bunch of dots on the screen that are overlapping each other. 
+
+##### Example: 8.2.1
+```{r}
+x <- rnorm(10000)
+y <- rnorm(10000)
+
+plot(x,y,col=c("red","blue"), pch=19)
+
+```
+
+##### Explanation: 8.2.1
+- It is a mess of points that are kind of overlapping each other, it's kind of hard to see the details.
+
+#### smoothScatter function: 
+
+- smoothScatter function creates a 2D histogram, of the points in plot and it just plots the histogram using a certain set of colors.
+- The default set of colors that it uses is the blues palette in the RColorBrewer package
+    - which is a sequential palette and 
+    - it gets kind of darker blue as you get higher and 
+    - lighter blue as you get lower.
+
+##### Example: 8.2.2
+```{r}
+x <- rnorm(10000)
+y <- rnorm(10000)
+
+smoothScatter(x,y)
+
+```
+
+##### Explanation: 8.2.1
+
+- The darker blue areas of this plot are the high density.
+- most the points are in the high density region and the lighter blue parts of the plot are the lower density regions of the plot.
+
+### 10. Practice
 ```{r}
 pal6 <- colorRampPalette(c("sienna2","gray100","seagreen3"))
 
