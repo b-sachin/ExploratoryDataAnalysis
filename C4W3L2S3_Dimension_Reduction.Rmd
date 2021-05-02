@@ -1,0 +1,743 @@
+---
+title: "Dimension Reduction"
+author: "Mr. Sachin B."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Dimension Reduction
+
+- Dimension Reduction is process of finding subsets of variables in datasets that contain their essences.
+
+- As data scientists, we'd like to find a smaller set of multivariate variables that are uncorrelated AND explain as much variance (or variability) of the data as possible.
+  - This is a statistical approach.
+- In other words, we'd like to find the best matrix created with fewer variables (that is, a lower rank matrix) that explains the original data.
+  - This is related to data compression.
+
+<br>
+
+- Two related solutions to these problems are
+  1. **PCA** which stands for Principal Component Analysis and 
+  2. **SVD**, Singular Value Decomposition.
+
+<hr>
+
+### 1.1. **SVD**, Singular Value Decomposition
+
+#### $X=UDV^t$
+
+- This latter simply means that we express a matrix $X$ of observations (rows) and variables (columns) as the product of 3 other matrices.
+  - This last term ($V^t$) represents the transpose of the matrix $V$.
+<br>
+- Here,
+  - $U$ and $V$ each have orthogonal (uncorrelated) columns.
+  - $D$ is a diagonal matrix, by which we mean that all of its entries not on the diagonal are 0.
+  
+<br>
+
+  1. $U$'s columns are the left singular vectors of $X$ and 
+  2. $V$'s columns are the right singular vectors of $X$.
+  3. The diagonal entries of $D$ are the singular values of $X$.
+
+<hr>
+
+#### 1.1.1. Original Matrix 
+```{r}
+matx <- matrix(c(1,2,2,5,3,7), nrow = 2)
+matx
+```
+
+#### 1.1.2. svd()
+```{r}
+svd_res <- svd(matx)
+svd_res
+```
+
+##### Explanation:
+  
+- We see that the function returns 3 components,
+  1. `d` which holds 2 diagonal elements, 
+  2. `u`, a 2 by 2 matrix, and 
+  3. `v`, a 3 by 2 matrix. 
+
+#### 1.1.3.Recover Original Matrix from SVD Matrices
+
+Syntax: $X=UDV^t$
+
+```{r}
+matx_recovered <- svd_res$u %*% diag(svd_res$d) %*% t(svd_res$v)
+
+matx_recovered
+
+# Cross Check
+all.equal(matx, matx_recovered)
+```
+
+<hr>
+
+### 1.2 **PCA**, Principal Component Analysis
+
+- Principal Component Analysis, "a simple, non-parametric method for extracting relevant information from confusing data sets." 
+
+- The paper by Jonathon Shlens of Google Research is called, A Tutorial on Principal Component Analysis.
+  - http://arxiv.org/pdf/1404.1100.pdf. 
+
+<hr>
+- Basically, **PCA is a method to reduce a high-dimensional data set to its essential elements (not lose information) and explain the variability in the data.**
+
+<hr>
+
+#### 1.2.1 SVD and PCA are closely related
+
+**Demonstration**:
+
+1. First we have to scale matx, (our simple example data matrix.)
+  - This means that we subtract the column mean from every element and divide the result by the column standard deviation.
+  - `scale`, that does this for us.
+
+#### 1.2.2 svd() on scale of matx
+```{r}
+svd(scale(matx))
+```
+
+2. Now run the R program prcomp on scale(mat).
+  - This will give you the principal components of matx.
+
+#### 1.2.3 prcomp() on scale of matx
+```{r}
+prcomp(scale(matx))
+```
+
+#### 1.2.4 Explanation
+
+- Notice that the principal components of the scaled matrix (**PC1 & PC2**), shown in the Rotation component **of the prcomp output**, 
+- **ARE the**
+- **columns of V, the right singular values in svd output**.
+- Thus, **PCA of a scaled matrix yields the V matrix (right singular vectors of svd) of the same scaled matrix**.
+
+## 2. Case Study: Single Pattern Finding using PCA & SVD
+
+### 2.1. Dataset without Any Pattern (Random Dataset)
+
+```{r}
+set.seed(12345)
+dataMat <- matrix(rnorm(400), nrow = 40)
+head(dataMat)
+
+```
+
+##### Explanation
+
+- This is dataMat, a matrix of 400 random normal numbers (mean 0 and standard deviation 1).
+- dataMat has 10 columns (and hence 40 rows) of random numbers. 
+
+<hr>
+
+#### 2.1.1 Image of Random Numbers (dataMat)
+```{r}
+image(1:10,1:40,t(dataMat)[,nrow(dataMat):1])
+
+```
+
+##### Explanation:
+
+- The image here looks pretty random.
+
+<hr>
+
+#### 2.1.2 heatmap()
+```{r}
+heatmap(dataMat)
+```
+
+##### Explanation:
+
+- We can see that even with the clustering that heatmap provides, permuting the rows (observations) and columns (variables) independently, 
+- the data still looks random.
+
+<hr>
+
+### 2.2. Dataset with Pattern
+```{r}
+set.seed(678910)
+for(i in 1:40){
+  # flip a coin
+  coinFlip <- rbinom(1,size=1,prob=0.5)
+  # if coin is heads add a common pattern to that row
+  if(coinFlip){
+    dataMat[i,] <- dataMat[i,] + rep(c(0,3),each=5)
+  }
+}
+```
+
+##### Explanation:
+
+- So whether or not a row gets modified by a pattern is determined by a coin flip.
+- So in rows affected by the coin flip, the 5 left columns will still have a mean of 0 but the right 5 columns will have a mean closer to 3.
+
+<hr>
+
+#### 2.2.1 Image with Pattern Added
+```{r}
+image(1:10,1:40,t(dataMat)[,nrow(dataMat):1])
+```
+
+##### Explanation:
+
+- Here's the image of the altered dataMat after the pattern has been added.
+- The pattern is clearly visible in the columns of the matrix.
+- The right half is reddish or hotter, indicating higher values in the matrix.
+
+<hr>
+
+#### 2.2.2 heatmap with Pattern Added
+```{r}
+heatmap(dataMat)
+```
+
+##### Explanation:
+
+- Again we see the pattern in the columns of the matrix.
+- As shown in the dendrogram at the top of the display, these split into 2 clusters,
+  - the lower numbered columns (1 through 5) and
+  - the higher numbered ones (6 through 10)
+- The rows still look random.
+
+<hr>
+
+####  2.2.3 Reorder Data according to Clustering to Make Pattern visible
+```{r}
+hh <- hclust(dist(dataMat))
+dataMatOrdered <- dataMat[hh$order,]
+
+image(t(dataMatOrdered)[,nrow(dataMatOrdered):1])
+```
+
+##### Explanation:
+
+- Now consider this picture. On the left is an image similar to the heatmap of dataMatix we just plotted.
+- It is an image plot of the output of hclust(), a hierarchical clustering function applied to dataMatrix.
+  - Red indicates "hotter" or higher values than Yellow.
+  - This is consistent with the pattern we applied to the data (increasing the values for some of the rightmost columns).
+
+<hr>
+
+### 2.3 Relationship between PCA and SVD
+
+```{r}
+svd1 <- svd(scale(dataMat)) # dataMatOrdered
+svd1
+
+pca1 <- prcomp(scale(dataMat))
+pca1
+
+plot(pca1$rotation[,1],svd1$v[,1], pch = 19, xlab = "Principal Component 1", ylab = "Right Singular Vector 1")
+
+abline(lm(svd1$v[,1] ~ pca1$rotation[,1]))
+```
+
+##### Explanation:
+
+- Above plot showing the relationship between PCA and SVD for pattern added matrix.
+- We've plotted 10 points (5 are squished together in the bottom left corner).
+  - The x-coordinates are the elements of the first principal component (output from prcomp), and 
+  - the y-coordinates are the elements of the first column of V, the first right singular vector (gotten from running svd). - We see that the points all lie on the 45 degree line represented by the equation y=x.
+- So the first column of V IS the first principal component of our bigger data matrix.
+
+### 2.4 Patterns in Rows and Columns (Without SVD & PCA)
+
+```{r}
+hh <- hclust(dist(dataMat))
+dataMatOrdered <- dataMat[hh$order,]
+
+par(mfrow = c(1,3))
+image(t(dataMatOrdered)[,nrow(dataMatOrdered):1])
+
+plot(rowMeans(dataMatOrdered),40:1,xlab = "Row Mean", ylab = "Row", pch = 19)
+
+
+plot(colMeans(dataMatOrdered),xlab = "Column", ylab = "Column Mean", pch = 19)
+
+```
+
+##### Explanation 1 (Leftmost Image):
+
+- Now consider this picture. On the left is an image similar to the heatmap of dataMatix we just plotted.
+- It is an image plot of the output of hclust(), a hierarchical clustering function applied to dataMatrix.
+  - Red indicates "hotter" or higher values than Yellow.
+  - This is consistent with the pattern we applied to the data (increasing the values for some of the rightmost columns).
+  
+##### Explanation 2 (Middle Plot):
+
+- The middle display shows the mean of each of the 40 rows (along the x-axis).
+- The rows are shown in the same order as the rows of the heat matrix on the left. 
+
+##### Explanation 3 (Rightmost Plot):
+
+- The rightmost display shows the mean of each of the 10 columns.
+- Here the column numbers are along the x-axis and their means along the y.
+
+##### Explanation 4 (Common):
+
+- We see immediately the connection between the red (hotter) portion of the cluster image and the higher row means, both in the upper right portion of the displays.
+- Similarly, the higher valued column means are in the right half of that display and lower colummn means are in the left half.
+
+### 2.5 Patterns in Rows and Columns (With SVD - $u$ and $v$)
+
+```{r}
+hh <- hclust(dist(dataMat))
+dataMatOrdered <- dataMat[hh$order,]
+
+svd2 <- svd(scale(dataMatOrdered))
+
+par(mfrow = c(1,3))
+image(t(dataMatOrdered)[,nrow(dataMatOrdered):1])
+
+
+# Plot for row Without SVD
+
+## plot(rowMeans(dataMatOrdered),40:1,xlab = "Row Mean", ylab = "Row", pch = 19)
+
+# Plot for row  with SVD
+plot(svd2$u[,1], 40:1, xlab = "Row", ylab = "First Left Singular Vector", pch = 19)
+
+# Plot for column Without SVD
+
+## plot(colMeans(dataMatOrdered),xlab = "Column", ylab = "Column Mean", pch = 19)
+
+# Plot for column with SVD
+plot(svd2$v[,1], xlab = "Column", ylab = "First Right Singular Vector", pch = 19)
+
+```
+
+##### Explanation 1 (Leftmost Image):
+
+- The clustered data matrix on the left. 
+  
+##### Explanation 2 (Middle Plot):
+
+- Next to it we've plotted the first column of the U matrix associated with the scaled data matrix.
+- This is the first LEFT singular vector and it's associated with the ROW means of the clustered data.
+- We can see the clear separation between the top 24 (around -0.2) row means and the bottom 16 (around 0.2).
+- We don't show them but note that the other columns of U don't show this pattern so clearly.
+
+##### Explanation 3 (Rightmost Plot):
+
+- The rightmost display shows the first column of the V matrix associated with the scaled and clustered data matrix.
+- This is the first RIGHT singular vector and it's associated with the COLUMN means of the clustered data.
+- You can see the clear separation between the left 5 column means (between -0.1 and 0.1) and the right 5 column means (all below -0.4).
+- As with the left singular vectors, the other columns of V don't show this pattern as clearly as this first one does.
+
+##### Explanation 4 (Common):
+
+- So the singular value decomposition automatically picked up these patterns, the differences in the row and column means.
+
+
+### 2.5.1 Why were the first columns of both the $U$ and $V$ matrices so special?
+
+- The $D$ matrix of the SVD explains this phenomenon.
+- It is an aspect of SVD called **variance explained**.
+- As we know that $D$ is the diagonal matrix sandwiched in between $U$ and $V^t$ in the SVD representation of the data matrix.
+- The diagonal entries of $D$ are like weights for the $U$ and $V$ columns accounting for the variation in the data.
+- They're given in decreasing order from highest to lowest.
+
+```{r}
+svd2$d
+
+par(mfrow = c(1,2))
+
+plot(svd2$d, xlab = "Column" , ylab = "Singular Value", pch = 19)
+
+plot(svd2$d^2/sum(svd2$d^2), xlab = "Column", ylab = "Prop. of Variance Explained", pch =19)
+```
+
+##### Explanation 1 (Left Plot):
+
+- Here's a display of these values (on the left).
+- The first one (12.46) is significantly bigger than the others.
+
+##### Explanation 2 (Right Plot):
+
+- Since we don't have any units specified, to the right we've plotted the proportion of the variance each entry represents.
+- We see that the first entry accounts for about 40% of the variance in the data.
+- This explains why the first columns of the U and V matrices respectively showed the distinctive patterns in the row and column means so clearly.
+
+### 2.5.2 Example to show how SVD explains Variance
+
+#### 2.5.2.1 Original Matrix 
+```{r}
+matx2 <- matrix(rep(c(0,1),each = (40*10)/2), nrow = 40)
+matx2
+```
+
+##### Explanation: 
+
+- You can see that the left 5 columns are all 0's and the right 5 columns are all 1's.
+
+#### 2.5.2.2 svd()
+```{r}
+svd3 <- svd(matx2)
+
+cat("$d\n",svd3$d,"\n\n")
+cat("$u - Sample 1 Row\n",svd3$u[1,],"\n\n")
+cat("$v - Sample 1 Row\n",svd3$v[1,])
+
+```
+
+##### Explanation for $d: 
+
+- Only 1st value of $d is positive all other values are negative.
+- So the first entry by far dominates the others.
+
+
+#### 2.5.2.3 SVD - Variance Explained
+```{r}
+par(mfrow=c(1,3))
+image(t(matx2)[,nrow(matx2):1])
+
+plot(svd3$d, xlab = "Column" , ylab = "Singular Value", pch = 19)
+
+plot(svd3$d^2/sum(svd3$d^2), xlab = "Column", ylab = "Prop. of Variance Explained", pch =19)
+```
+
+##### Explanation 1 (Left Image):
+
+- Here the picture on the left shows the heat map of matx2.
+- You can see how the left columns differ from the right ones.
+
+##### Explanation 2 (Middle Plot):
+
+- The middle plot shows the values of the singular values of the matrix,
+  - i.e., the diagonal elements which are the entries of svd3$d.
+- Nine of these are 0 and the first is a little above 14.
+
+##### Explanation 3 (Right Plot):
+
+- The third plot shows the proportion of the total each diagonal element represents.
+- According to the plot, 100% of the total variation does the first diagonal element account for.
+
+<hr>
+
+- So what does this mean?
+  - Basically that the data is one-dimensional.
+  - Only 1 piece of information, namely which column an entry is in, determines its value.
+
+## 3. Case Study: Double Pattern Finding using PCA & SVD
+
+- Now let's take random 40 by 10 dataMat2 
+- consider a example in which we add 2 patterns to it.
+- we'll choose which rows to tweak using coinflips.
+
+<hr>
+
+- Specifically, for each of the 40 rows we'll flip 2 coins.
+  - If the first coinflip is heads, we'll add 5 to each entry in the right 5 columns of that row, and 
+  - if the second coinflip is heads, we'll add 5 to just the even columns of that row.
+ 
+#### 3.1 Adding 2nd Pattern to Existing Matrix 'dataMat'
+```{r}
+# Adding 2nd Pattern to 'dataMat'
+set.seed(678910)
+
+for(i in 1:40) {
+  
+  # flip a coin
+  coinFlip1 <- rbinom(n = 1, size = 1, prob = 0.5)
+  coinFlip2 <- rbinom(n = 1, size = 1, prob = 0.5)
+  
+  # if coin is heads add a common pattern to that row
+  
+  if(coinFlip1) {
+    dataMat[i,] <- dataMat[i,]+rep(c(0,5), each = 5)
+  }
+  
+  if(coinFlip2) {
+    dataMat[i,] <- dataMat[i,]+rep(c(0,5), times = 5)
+  }
+}
+
+```
+
+#### 3.2 Reorder Data according to Clustering to Make Pattern visible
+
+```{r}
+hh <- hclust(dist(dataMat))
+dataMatOrdered2 <- dataMat[hh$order,]
+
+par(mfrow = c(1,3))
+
+image(t(dataMatOrdered2)[,nrow(dataMatOrdered2):1])
+
+plot(rep(c(0,1), each = 5), pch = 19, xlab = "column", ylab = "Pattern 1")
+
+plot(rep(c(0,1), times = 5), pch = 19, xlab = "column", ylab = "Pattern 2")
+
+``` 
+
+##### Explanation 1 (Left Image):
+
+- So here's the image of the data matrix on the left.
+- We can see both patterns, the clear difference between the left 5 and right 5 columns, but also, slightly less visible, the alternating pattern of the columns.
+
+##### Explanation 2 (Middle Plot):
+
+- The middle plot shows the true difference between the left and right columns.
+
+##### Explanation 3 (Right Plot):
+
+- The rightmost plot shows the true difference between the odd numbered and even-numbered columns.
+
+#### 3.3 Can our analysis detect these patterns just from the data?
+
+#### 3.3.1 Examining svd $V^t$  Plot
+ - Let's see what SVD shows.
+ - Since we're interested in patterns on columns we'll look at the first two right singular vectors (columns of V) to see if they show any evidence of the patterns.
+ 
+```{r}
+svd4 <- svd(scale(dataMatOrdered2))
+
+par(mfrow = c(1,3))
+
+image(t(dataMatOrdered2)[,nrow(dataMatOrdered2):1])
+
+plot(svd4$v[,1], pch = 19, xlab = "column", ylab = "First right singular vector")
+
+plot(svd4$v[,2], pch = 19, xlab = "column", ylab = "Second right singular vector")
+
+```
+
+##### Explanation 1 (Left Image):
+
+- Image of the data matrix.
+
+##### Explanation 2 (Middle Plot):
+
+- The middle plot does show that the last 5 columns have higher entries than the first 5.
+- This picks up, or at least alludes to, the first pattern we added in which affected the last 5 columns of the matrix. 
+
+##### Explanation 3 (Right Plot):
+
+- The rightmost plot, showing the second column of V, looks more random.
+- However, closer inspection shows that the entries alternate or bounce up and down as you move from left to right.
+- This hints at the second pattern we added in which affected only even columns of selected rows.
+
+#### 3.3.2 Examining svd $V^t$ Matrix data
+
+- To see this more closely, look at the first 2 columns of the v component.
+
+```{r}
+svd4$v[,1:2]
+
+```
+
+##### Explanation:
+
+- Seeing the 2 columns side by side, we see that the values in both columns alternately increase and decrease.
+- However, we knew to look for this pattern, so chances are, you might not have noticed this pattern if you hadn't known if was there.
+
+<hr>
+
+- **This example is meant to show you that it's hard to see patterns, even straightforward ones.**
+
+<hr>
+
+#### 3.3.3 Examining svd $D$ Matrix data
+```{r}
+svd4$d
+```
+
+##### Explanation:
+
+- We see that the first element, 14.08, dominates the others.
+
+#### 3.3.4 Examining svd $D$ Plot
+```{r}
+par(mfrow = c(1,2))
+
+plot(svd4$d, xlab = "Column" , ylab = "Singular Value", pch = 19)
+
+plot(svd4$d^2/sum(svd4$d^2), xlab = "Column", ylab = "Prop. of Variance Explained", pch =19)
+```
+
+##### Explanation:
+
+- The left shows the numerical entries and 
+- the right show the percentage of variance each entry explains.
+
+<br>
+
+- So the first element which showed the difference between the left and right halves of the matrix accounts for roughly 50% of the variation in the matrix, and 
+- the second element which picked up the alternating pattern accounts for 18% of the variance.
+- The remaining elements account for smaller percentages of the variation.
+
+<br>
+
+- This indicates that the first pattern is much stronger than the second.
+- Also the two patterns confound each other so they're harder to separate and see clearly.
+- This is what often happens with real data.
+
+## 4. Missing Values handling for PCA & SVD
+
+- The problem with PCA & SVD is that they cannot deal with MISSING data.
+- Neither of them will work if any data in the matrix is missing. (You'll get error messages from R in red if you try.)
+- Missing data is not unusual, so luckily we have ways to work around this problem.
+- One we'll just mention is called imputing the data.
+
+#### 4.1.1 Creating Missing Values in dataset
+```{r}
+dataMis <- dataMatOrdered2
+
+# Randomly insert some missing data
+
+dataMis[sample(1:100, size = 40, replace = TRUE)] <- NA
+
+dataMis[1:10,1:5]
+
+```
+
+#### 4.1.2 Error 
+```{r eval=FALSE}
+
+svd5 <- svd(scale(dataMis)) # Doesn't Work
+
+# Error in svd(scale(dataMis)) : infinite or missing values in 'x'
+```
+
+#### 4.1.3 Installing 'impute' package
+
+```{r eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("impute")n
+```
+
+#### 4.1.4 Imputing {impute}
+```{r}
+library(impute)
+
+dataMis <- impute.knn(dataMis)$data
+
+dataMis[1:10,1:5]
+```
+
+#### 4.1.5 Checking svd() Working or Not ?
+```{r}
+svd5 <- svd(scale(dataMis))
+```
+
+#### 4.1.6 Comparison with Original data with Missing Rectified Data
+```{r}
+svd_og <- svd(scale(dataMatOrdered2))
+svd_rect <- svd(scale(dataMis))
+
+par(mfrow = c(1,2))
+
+plot(svd_og$v[,1],pch=19)
+plot(svd_rect$v[,1],pch=19)
+
+```
+
+## 5. Power of SVD and PCA and their working as data compression technique
+
+#### 5.1.1 Loading dataset and plotting Image
+```{r}
+load("./data/face.rda")
+
+faceData[1:10,1:10]
+dim(faceData)
+
+image(t(faceData)[,nrow(faceData):1])
+
+```
+
+#### 5.1.2 Apply svd()
+```{r}
+
+svd_face <- svd(scale(faceData))
+
+```
+
+#### 5.1.3 Variance Explained Plot
+```{r}
+par(mfrow = c(1,2))
+
+plot(svd_face$d, xlab = "Column" , ylab = "Singular Value", pch = 19)
+
+plot(svd_face$d^2/sum(svd_face$d^2), xlab = "Column", ylab = "Prop. of Variance Explained", pch =19)
+```
+
+##### Explanation:
+
+- So 40% of the variation in the data matrix is explained by the first component, 22% by the second, and so forth.
+- It looks like most of the variation is contained in the first 10 components.
+
+#### 5.1.4 Can we try to create an approximate image using only a few components?
+
+- Suppose we create the product of pieces of these, say the first columns of U and V and the first element of D.
+- The first column of U can be interpreted as a 32 by 1 matrix (recall that faceData was a 32 by 32 matrix), so we can multiply it by the first element of D, a 1 by 1 matrix, and get a 32 by 1 matrix result.
+- We can multiply that by the transpose of the first column of V, which is the first principal component. (We have to use the transpose of V's column to make it a 1 by 32 matrix in order to do the matrix multiplication properly.)
+
+
+#### 5.1.4.1 Using only 1st Column
+```{r}
+face_compress1 <- (svd_face$u[,1] * svd_face$d[1]) %*% t(svd_face$v[,1])
+
+image(t(face_compress1)[,nrow(face_compress1):1])
+
+```
+
+##### Explanation:
+- It might not look like much but it's a good start.
+
+#### 5.1.4.2 Using 1st and 2nd Columns
+```{r}
+face_compress2 <- svd_face$u[,1:2] %*% diag(svd_face$d[1:2]) %*% t(svd_face$v[,1:2])
+
+image(t(face_compress2)[,nrow(face_compress2):1])
+
+```
+
+##### Explanation:
+
+- We're starting to see slightly more detail, and maybe if you squint you see a grimacing mouth.
+
+#### 5.1.4.3 Using 5 Columns
+
+- Now let's see what image results using 5 components.
+- From our plot of the variance explained 5 components covered a sizeable percentage of the variation.
+
+```{r}
+face_compress3 <- svd_face$u[,1:5] %*% diag(svd_face$d[1:5]) %*% t(svd_face$v[,1:5])
+
+image(t(face_compress3)[,nrow(face_compress3):1])
+
+```
+
+##### Explanation:
+
+- Certainly much better.
+- Clearly a face is appearing with eyes, nose, ears, and mouth recognizable.
+
+#### 5.1.4.4 Using 10 Columns
+
+```{r}
+face_compress4 <- svd_face$u[,1:10] %*% diag(svd_face$d[1:10]) %*% t(svd_face$v[,1:10])
+
+image(t(face_compress4)[,nrow(face_compress4):1])
+
+```
+
+##### Explanation:
+
+- Now that's pretty close to the original which was low resolution to begin with, but you can see that 10 components really do capture the essence of the image.
+- Singular value decomposition is a good way to approximate data without having to store a lot.
+
+## 6. Important Points to Remember
+
+1. When reducing dimensions you have to pay attention to the scales on which different variables are measured and make sure that all your data is in consistent units.
+    - In other words, scales of your data matter.
+2. Principal components and singular values may mix real patterns, as we saw in our simple 2-pattern example, so finding and separating out the real patterns require some detective work.
