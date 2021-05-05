@@ -1,5 +1,5 @@
 ---
-title: "Clustering Case Study"
+title: "Case Study: Human Activity Recognition using Smartphones"
 author: "Mr. Sachin B."
 output: html_document
 ---
